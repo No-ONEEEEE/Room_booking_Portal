@@ -36,3 +36,8 @@ function feedbackRoutes($method, $path, $input, $query, $pdo) {
 
     return null;
 }
+
+/*
+TODO: POST /feedback => Pass bookingId as a path parameter instead of in the body 
+TODO: GET /feedback => Remove
+*/
