@@ -31,3 +31,7 @@ function authRoutes($method, $path, $input, $query, $pdo) {
 
     return null;
 }
+
+/*
+TODO: Move GET /me endpoint to user.routes
+*/
