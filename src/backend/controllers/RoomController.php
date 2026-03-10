@@ -157,7 +157,37 @@ class RoomController {
         $end = strtotime($endTime);
 
         if (!$start || !$end) {
-            return error("Invalid time format", 400, ["time" => "Invalid time format provided"]);
+            return error(
+                "Invalid time format",
+                400,
+                ["time" => "Invalid time format provided"]
+            );
+        }
+
+        if ($end <= $start) {
+            return error(
+                "Invalid time range",
+                400,
+                ["endTime" => "End time must be after start time"]
+            );
+        }
+
+        $validTypes = ['classroom', 'meeting'];
+
+        if ($type !== null && !in_array($type, $validTypes)) {
+            return error(
+                "Invalid room type",
+                400,
+                ["type" => "Allowed values: classroom, meeting"]
+            );
+        }
+
+        if ($capacity !== null && (!ctype_digit((string)$capacity) || $capacity < 1)) {
+            return error(
+                "Invalid capacity value",
+                400,
+                ["capacity" => "Capacity must be a positive integer"]
+            );
         }
 
         $startTime = date('Y-m-d H:i:s', $start);

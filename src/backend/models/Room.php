@@ -66,16 +66,6 @@ class Room {
     }
 
     public function getAvailableRooms($start_time, $end_time, $type = null, $capacity = null) {
-        if ($end_time <= $start_time) {
-            return [];
-        }
-
-        $validTypes = ['classroom', 'meeting'];
-
-        if ($type !== null && !in_array($type, $validTypes)) {
-            return [];
-        }
-
         $query = "
             SELECT *
             FROM rooms r
@@ -106,7 +96,7 @@ class Room {
         $stmt = $this->pdo->prepare($query);
         $stmt->execute($params);
 
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function isAvailable($roomId, $startTime, $endTime) {
