@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rook | Advanced Room Booking Platform</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Login View -->
+    <section id="view-login">
+        <div class="glass-card" style="width: 100%; max-width: 400px; padding: 3rem;">
+            <div class="logo" style="justify-content: center; margin-bottom: 2rem;">
+                <i class="fas fa-microchip"></i>
+                <span>ROOK</span>
+            </div>
+            <h2 style="text-align: center; margin-bottom: 0.5rem;">Welcome Back</h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">Enter your email to access
+                the terminal.</p>
+
+            <form id="login-form">
+                <div class="input-group">
+                    <label>Corporate Email</label>
+                    <input type="email" id="login-email" placeholder="name@company.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; justify-content: center; margin-top: 1rem;">
+                    Initialize Session
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <div class="app-container hidden" id="main-app">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-microchip"></i>
+                <span>ROOK</span>
+            </div>
+
+            <nav class="nav-links">
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-view="rooms">
+                    <i class="fas fa-door-open"></i> <span>Book Room</span>
+                </a>
+                <a href="#" class="nav-item" data-view="my-bookings">
+                    <i class="fas fa-calendar-alt"></i> <span>My Schedule</span>
+                </a>
+                <a href="#" class="nav-item admin-only hidden" data-view="admin">
+                    <i class="fas fa-user-shield"></i> <span>Admin Panel</span>
+                </a>
+            </nav>
+
+            <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-glass);">
+                <div class="nav-item" id="sidebar-user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <div>
+                        <div id="user-display-name" style="font-size: 0.9rem;">User</div>
+                        <div id="user-display-role"
+                            style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Role</div>
+                    </div>
+                </div>
+                <a href="#" class="nav-item" id="btn-logout" style="color: var(--status-declined);">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+
+            <!-- Dashboard View -->
+            <section id="view-dashboard" class="page-view fade-in">
+                <div class="dashboard-header">
+                    <h1 id="dashboard-title">Command Center</h1>
+                    <p id="dashboard-desc" class="text-secondary">Overview of system status and room utilization.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="glass-card stat-card">
+                        <span class="stat-label">Total Rooms</span>
+                        <span class="stat-value" id="stat-total-rooms">12</span>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <span class="stat-label">Active Bookings</span>
+                        <span class="stat-value" id="stat-active-bookings">8</span>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <span class="stat-label">Pending Requests</span>
+                        <span class="stat-value" id="stat-pending-requests"
+                            style="color: var(--status-pending);">3</span>
+                    </div>
+                    <div class="glass-card stat-card admin-only hidden">
+                        <span class="stat-label">System Uptime</span>
+                        <span class="stat-value">99.9%</span>
+                    </div>
+                </div>
+
+                <div class="admin-layout">
+                    <div class="glass-card admin-only hidden">
+                        <h3 style="margin-bottom: 1.5rem;">Booking Analytics</h3>
+                        <canvas id="usageChart" height="200"></canvas>
+                    </div>
+                    <div class="glass-card">
+                        <h3 style="margin-bottom: 1.5rem;">Recent Activity</h3>
+                        <div id="activity-feed">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Book Room View -->
+            <section id="view-rooms" class="page-view hidden fade-in">
+                <div class="dashboard-header">
+                    <h1>Book Room</h1>
+                    <p class="text-secondary">Fill out the details to find and reserve a room.</p>
+                </div>
+
+                <div class="glass-card" id="book-form-container">
+                    <form id="book-room-form">
+                        <div class="input-group">
+                            <label>Name</label>
+                            <input type="text" id="book-name" readonly>
+                        </div>
+                        <div class="input-group">
+                            <label>Expected Number of Attendees</label>
+                            <input type="number" id="book-expected-number" min="1" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Purpose</label>
+                            <input type="text" id="book-purpose" placeholder="e.g. Quantum Computing Sprint" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Type of Room</label>
+                            <select id="book-room-type">
+                                <option value="">Any Type</option>
+                                <option value="meeting">Meeting Room</option>
+                                <option value="classroom">Classroom Area</option>
+                                <option value="conference">Conference</option>
+                                <option value="lab">Lab</option>
+                            </select>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="input-group">
+                                <label>Start Date & Time</label>
+                                <input type="datetime-local" id="book-start-time" required>
+                            </div>
+                            <div class="input-group">
+                                <label>End Date & Time</label>
+                                <input type="datetime-local" id="book-end-time" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Participants</label>
+                            <div id="book-participants-list" style="max-height: 150px; overflow-y: auto; background: var(--glass-bg); padding: 0.5rem; border: 1px solid var(--border-glass); border-radius: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                                <!-- Checkboxes injected here -->
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Remarks</label>
+                            <textarea id="book-remarks" rows="3" placeholder="Additional notes..."></textarea>
+                        </div>
+                        <div class="input-group" style="flex-direction: row; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="book-snacks-requested" style="width: auto;">
+                            <label style="margin-bottom: 0;">Request refreshments</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="btn-check-availability" style="margin-top: 1rem; width: 100%; justify-content: center;">Check Available Rooms</button>
+                    </form>
+                </div>
+
+                <div id="available-rooms-section" class="hidden" style="margin-top: 2rem;">
+                    <h3>Available Rooms</h3>
+                    <div class="room-grid" id="room-container">
+                        <!-- Room cards inserted here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Bookings View -->
+            <section id="view-my-bookings" class="page-view hidden fade-in">
+                <div class="dashboard-header"
+                    style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h1>My Schedule</h1>
+                        <p class="text-secondary">Manage your upcoming and past reservations.</p>
+                    </div>
+                    <div class="schedule-view-toggle">
+                        <button class="view-toggle-btn active" id="btn-view-list" onclick="switchScheduleView('list')">
+                            <i class="fas fa-list"></i> List
+                        </button>
+                        <button class="view-toggle-btn" id="btn-view-calendar" onclick="switchScheduleView('calendar')">
+                            <i class="fas fa-calendar-alt"></i> Calendar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- List View -->
+                <div id="schedule-list-view">
+                    <!-- Status Filter Tabs -->
+                    <div class="booking-status-tabs">
+                        <button class="status-tab active" data-status="all">All</button>
+                        <button class="status-tab" data-status="pending">Pending</button>
+                        <button class="status-tab" data-status="approved">Approved</button>
+                        <button class="status-tab" data-status="completed">Completed</button>
+                        <button class="status-tab" data-status="cancelled">Cancelled</button>
+                        <button class="status-tab" data-status="declined">Declined</button>
+                    </div>
+
+                    <!-- Bookings List -->
+                    <div id="bookings-list" class="bookings-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Calendar View -->
+                <div id="schedule-calendar-view" class="hidden">
+                    <div class="glass-card">
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Panel View -->
+            <section id="view-admin" class="page-view hidden fade-in">
+                <div class="dashboard-header">
+                    <h1>Administrative Control</h1>
+                    <p class="text-secondary">Process room requests and manage system assets.</p>
+                </div>
+
+                <div class="stats-grid admin-only hidden">
+                    <div class="glass-card stat-card">
+                        <span class="stat-label">Pending Approval</span>
+                        <span class="stat-value" id="admin-stat-pending">-</span>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <span class="stat-label">Total Users</span>
+                        <span class="stat-value">124</span>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3>Pending Requests</h3>
+                        <button class="btn" onclick="refreshAdminData()" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Room</th>
+                                    <th>Time Slot</th>
+                                    <th>Purpose</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-pending-table">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Admin Feedback Section -->
+                <div class="glass-card" style="margin-top: 2rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3>User Feedback</h3>
+                        <button class="btn" onclick="refreshFeedbackData()" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div id="admin-feedback-container">
+                        <p class="text-dim" style="text-align: center; padding: 1rem;">Loading feedback...</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Booking Modal -->
+    <!-- Admin Action Modal -->
+    <div id="admin-modal" class="hidden"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="width: 100%; max-width: 450px;">
+            <h2 id="admin-modal-title">Action Required</h2>
+            <p id="admin-modal-desc" class="text-secondary" style="margin-bottom: 1.5rem;"></p>
+
+            <form id="admin-action-form">
+                <input type="hidden" id="admin-modal-booking-id">
+                <input type="hidden" id="admin-modal-action-type">
+
+                <div class="input-group">
+                    <label id="admin-modal-label">Reason / Notes</label>
+                    <textarea id="admin-modal-input" rows="4" placeholder="Type here..." required></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary" id="admin-modal-submit" style="flex: 1;">Confirm
+                        Action</button>
+                    <button type="button" class="btn" style="background: rgb(255, 255, 255);"
+                        onclick="closeAdminModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="hidden"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="width: 100%; max-width: 500px;">
+            <h2 id="modal-title" style="margin-bottom: 1rem;">Reserve Room</h2>
+            <form id="booking-form">
+                <input type="hidden" id="modal-room-id">
+                <div class="input-group">
+                    <label>Purpose of Visit</label>
+                    <input type="text" id="booking-purpose" placeholder="e.g. Quantum Computing Sprint" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="input-group">
+                        <label>Start Time</label>
+                        <input type="datetime-local" id="booking-start" required>
+                    </div>
+                    <div class="input-group">
+                        <label>End Time</label>
+                        <input type="datetime-local" id="booking-end" required>
+                    </div>
+                </div>
+                <div class="input-group"
+                    style="flex-direction: row; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" id="booking-snacks" style="width: auto;">
+                    <label style="margin-bottom: 0;">Request refreshments</label>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Request</button>
+                    <button type="button" class="btn" style="background: rgb(255, 255, 255);"
+                        onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="hidden"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="width: 100%; max-width: 450px;">
+            <h2 style="margin-bottom: 0.5rem;">Leave Feedback</h2>
+            <p class="text-secondary" style="margin-bottom: 1.5rem;">Rate your experience with this room booking.</p>
+            <form id="feedback-form">
+                <input type="hidden" id="feedback-booking-id">
+                <div class="input-group">
+                    <label>Rating</label>
+                    <div class="star-rating" id="star-rating">
+                        <i class="fas fa-star" data-value="1"></i>
+                        <i class="fas fa-star" data-value="2"></i>
+                        <i class="fas fa-star" data-value="3"></i>
+                        <i class="fas fa-star" data-value="4"></i>
+                        <i class="fas fa-star" data-value="5"></i>
+                    </div>
+                    <input type="hidden" id="feedback-rating" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Comments (optional)</label>
+                    <textarea id="feedback-comments" rows="3" placeholder="How was your experience?"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Feedback</button>
+                    <button type="button" class="btn" style="background: rgba(255,255,255,0.1);"
+                        onclick="closeFeedbackModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Room Feedback Modal -->
+    <div id="view-room-feedback-modal" class="hidden"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 id="room-feedback-title">Room Feedback</h2>
+                <button type="button" class="btn" style="background: rgba(255,255,255,0.1); padding: 0.5rem;" onclick="closeRoomFeedbackModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="room-feedback-list" style="overflow-y: auto; flex: 1; padding-right: 0.5rem;">
+                <p class="text-dim" style="text-align: center; padding: 1rem;">Loading feedback...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>
