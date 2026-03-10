@@ -50,8 +50,8 @@ class BookingController {
 
         if (!$room) {
             return error(
-                "Invalid room",
-                400,
+                "Room not found",
+                404,
                 ["roomId" => "Room does not exist"]
             );
         }
