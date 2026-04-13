@@ -9,12 +9,14 @@ require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Room.php';
 require_once __DIR__ . '/../models/Booking.php';
 require_once __DIR__ . '/../models/Feedback.php';
+require_once __DIR__ . '/../models/Notification.php';
 
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/RoomController.php';
 require_once __DIR__ . '/../controllers/BookingController.php';
 require_once __DIR__ . '/../controllers/FeedbackController.php';
 require_once __DIR__ . '/../controllers/UserController.php';
+require_once __DIR__ . '/../controllers/NotificationController.php';
 
 require_once __DIR__ . '/../routes/routes.php';
 

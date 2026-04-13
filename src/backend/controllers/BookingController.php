@@ -2,13 +2,19 @@
 
 require_once __DIR__ . '/../utils/email.php';
 
-class BookingController {
+class BookingController
+{
     private $bookingModel;
     private $roomModel;
+    private $userModel;
+    private $notificationModel;
 
-    public function __construct($pdo) {
+    public function __construct($pdo)
+    {
         $this->bookingModel = new Booking($pdo);
         $this->roomModel = new Room($pdo);
+        $this->userModel = new User($pdo);
+        $this->notificationModel = new Notification($pdo);
     }
 
     public function create(
@@ -126,6 +132,21 @@ class BookingController {
             }
         }
 
+        if (isset($result['booking_id'])) {
+            $bookingId = $result['booking_id'];
+            $admins = $this->userModel->getAdmins();
+            $roomName = $room['room_name'] ?? 'Room ' . $roomId;
+
+            foreach ($admins as $admin) {
+                $this->notificationModel->create(
+                    $admin['id'],
+                    $bookingId,
+                    "New booking request received for $roomName.",
+                    'info'
+                );
+            }
+        }
+
         return success(
             "Booking created",
             [
@@ -137,7 +158,8 @@ class BookingController {
         );
     }
 
-    public function getById($bookingId) {
+    public function getById($bookingId)
+    {
         if (!$bookingId) {
             return error(
                 "Booking id required",
@@ -160,7 +182,8 @@ class BookingController {
         );
     }
 
-    public function cancel($bookingId, $userId) {
+    public function cancel($bookingId, $userId)
+    {
         if (!$bookingId || !$userId) {
             return error("Booking id and user id required", 400);
         }
@@ -175,7 +198,7 @@ class BookingController {
             return error("You cannot cancel someone else's booking", 403);
         }
 
-        if (!in_array($booking['status'], ['pending','approved'])) {
+        if (!in_array($booking['status'], ['pending', 'approved'])) {
             return error("Booking cannot be cancelled", 409);
         }
 
@@ -214,7 +237,7 @@ class BookingController {
             return error("You cannot update someone else's booking", 403);
         }
 
-        if (!in_array($booking['status'], ['pending','approved'])) {
+        if (!in_array($booking['status'], ['pending', 'approved'])) {
             return error(
                 "Only pending or approved bookings can be updated",
                 409
@@ -224,7 +247,7 @@ class BookingController {
         $room = $this->roomModel->findById($booking['room_id']);
 
         $start = $startTime ? strtotime($startTime) : strtotime($booking['start_time']);
-        $end   = $endTime   ? strtotime($endTime)   : strtotime($booking['end_time']);
+        $end = $endTime ? strtotime($endTime) : strtotime($booking['end_time']);
 
         if (!$start || !$end) {
             return error("Invalid time format", 400);
@@ -304,7 +327,8 @@ class BookingController {
         return success("Booking updated");
     }
 
-    public function markCompleted($bookingId) {
+    public function markCompleted($bookingId)
+    {
         if (!$bookingId) {
             return error(
                 "Booking id required",
@@ -319,10 +343,21 @@ class BookingController {
             return error("Booking cannot be marked completed", 409);
         }
 
+        $booking = $this->bookingModel->findById($bookingId);
+        if ($booking) {
+            $this->notificationModel->create(
+                $booking['user_id'],
+                $bookingId,
+                "Your booking for room " . ($booking['room_name'] ?? $booking['room_id']) . " has been marked as completed.",
+                'info'
+            );
+        }
+
         return success("Booking marked completed");
     }
 
-    public function approve($bookingId) {
+    public function approve($bookingId)
+    {
         if (!$bookingId) {
             return error(
                 "Booking id required",
@@ -349,12 +384,21 @@ class BookingController {
         $booking = $this->bookingModel->findById($bookingId);
         if ($booking && isset($booking['user_email']) && isset($booking['user_name'])) {
             sendBookingApprovalEmail($booking['user_email'], $booking['user_name'], $booking);
+
+            // Notification
+            $this->notificationModel->create(
+                $booking['user_id'],
+                $bookingId,
+                "Your booking for room " . ($booking['room_name'] ?? $booking['room_id']) . " has been approved.",
+                'success'
+            );
         }
 
         return success("Booking approved");
     }
 
-    public function decline($bookingId, $reason) {
+    public function decline($bookingId, $reason)
+    {
         if (!$reason) {
             return error(
                 "Decline reason required",
@@ -377,12 +421,21 @@ class BookingController {
         $booking = $this->bookingModel->findById($bookingId);
         if ($booking && isset($booking['user_email']) && isset($booking['user_name'])) {
             sendBookingRejectionEmail($booking['user_email'], $booking['user_name'], $booking, $reason);
+
+            // Notification
+            $this->notificationModel->create(
+                $booking['user_id'],
+                $bookingId,
+                "Your booking for room " . ($booking['room_name'] ?? $booking['room_id']) . " was declined. Reason: " . $reason,
+                'error'
+            );
         }
 
         return success("Booking declined");
     }
 
-    public function requestMoreDetails($bookingId, $notes) {
+    public function requestMoreDetails($bookingId, $notes)
+    {
         if (!$notes) {
             return error(
                 "Clarification notes required",
@@ -401,10 +454,23 @@ class BookingController {
             return error("Unable to request more details", 409);
         }
 
+        if ($updated) {
+            $booking = $this->bookingModel->findById($bookingId);
+            if ($booking) {
+                $this->notificationModel->create(
+                    $booking['user_id'],
+                    $bookingId,
+                    "Additional details have been requested for your booking.",
+                    'info'
+                );
+            }
+        }
+
         return success("Clarification requested from user");
     }
 
-    public function filter($startDate = null, $endDate = null, $status = null, $roomId = null, $userId = null) {
+    public function filter($startDate = null, $endDate = null, $status = null, $roomId = null, $userId = null)
+    {
         if ($startDate !== null && !$this->isValidDate($startDate)) {
             return error("Invalid start date format", 400);
         }
@@ -413,7 +479,7 @@ class BookingController {
             return error("Invalid end date format", 400);
         }
 
-        $validStatuses = ['pending','approved','declined','cancelled','completed'];
+        $validStatuses = ['pending', 'approved', 'declined', 'cancelled', 'completed'];
 
         if ($status !== null && !in_array($status, $validStatuses)) {
             return error("Invalid status filter", 400);
@@ -435,7 +501,8 @@ class BookingController {
         );
     }
 
-    public function statistics($startDate = null, $endDate = null, $status = null, $roomId = null) {
+    public function statistics($startDate = null, $endDate = null, $status = null, $roomId = null)
+    {
         if ($startDate !== null && !$this->isValidDate($startDate)) {
             return error("Invalid start date format", 400);
         }
@@ -459,7 +526,8 @@ class BookingController {
         );
     }
 
-    private function isValidDate($date) {
+    private function isValidDate($date)
+    {
         $d = DateTime::createFromFormat('Y-m-d', $date);
         return $d && $d->format('Y-m-d') === $date;
     }

@@ -1,13 +1,18 @@
 <?php
 
-class RoomController {
+class RoomController
+{
     private $roomModel;
+    private $bookingModel;
 
-    public function __construct($pdo) {
+    public function __construct($pdo)
+    {
         $this->roomModel = new Room($pdo);
+        $this->bookingModel = new Booking($pdo);
     }
 
-    public function getRooms($type = null, $capacity = null) {
+    public function getRooms($type = null, $capacity = null)
+    {
         $rooms = $this->roomModel->getRooms($type, $capacity);
 
         if (isset($rooms['error'])) {
@@ -40,7 +45,8 @@ class RoomController {
         );
     }
 
-    public function getById($id) {
+    public function getById($id)
+    {
         if ($id === null) {
             return error(
                 "Room id is required",
@@ -75,7 +81,8 @@ class RoomController {
         );
     }
 
-    public function checkAvailability($roomId, $startTime, $endTime) {
+    public function checkAvailability($roomId, $startTime, $endTime)
+    {
         if (!$roomId || !$startTime || !$endTime) {
             return error(
                 "roomId, startTime and endTime are required",
@@ -141,7 +148,8 @@ class RoomController {
         );
     }
 
-    public function getAvailableRooms($startTime, $endTime, $type = null, $capacity = null) {
+    public function getAvailableRooms($startTime, $endTime, $type = null, $capacity = null)
+    {
         if (!$startTime || !$endTime) {
             return error(
                 "startTime and endTime are required",
@@ -182,7 +190,7 @@ class RoomController {
             );
         }
 
-        if ($capacity !== null && (!ctype_digit((string)$capacity) || $capacity < 1)) {
+        if ($capacity !== null && (!ctype_digit((string) $capacity) || $capacity < 1)) {
             return error(
                 "Invalid capacity value",
                 400,
@@ -203,7 +211,8 @@ class RoomController {
         );
     }
 
-    public function getFeedback($roomId) {
+    public function getFeedback($roomId)
+    {
         if (!$roomId) {
             return error(
                 "Room id is required",
@@ -224,6 +233,30 @@ class RoomController {
             "Room feedback fetched",
             [
                 "feedback" => $feedback
+            ]
+        );
+    }
+    public function getRoomBookings($roomId)
+    {
+        if (!$roomId) {
+            return error("Room id is required", 400);
+        }
+
+        $room = $this->roomModel->findById($roomId);
+        if (!$room) {
+            return error("Room not found", 404);
+        }
+
+        // Fetch bookings for the room (all statuses that matter for occupancy)
+        // We probably only want approved and pending bookings?
+        // Let's get all and let the frontend filter if needed, 
+        // or just return approved/pending as "occupied".
+        $bookings = $this->bookingModel->getBookingsForFilter(null, null, null, $roomId);
+
+        return success(
+            "Room bookings fetched",
+            [
+                "bookings" => $bookings
             ]
         );
     }

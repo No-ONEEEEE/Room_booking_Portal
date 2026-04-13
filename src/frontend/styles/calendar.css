@@ -1,0 +1,47 @@
+/* ROOK - Calendar: FullCalendar Overrides */
+
+.fc {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid var(--border-glass) !important;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border-color: var(--border-glass) !important;
+}
+
+.fc-day-today {
+    background: rgba(56, 189, 248, 0.05) !important;
+}
+
+/* Event Styling & Text Wrapping */
+.fc-event {
+    cursor: pointer;
+    border-radius: 6px !important;
+    padding: 2px 4px !important;
+    transition: transform 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.fc-event:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+}
+
+.fc-event-main {
+    white-space: normal !important;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.25;
+}
+
+.fc-daygrid-event {
+    white-space: normal !important;
+    align-items: flex-start !important;
+}
+
+.fc-daygrid-block-event .fc-event-title {
+    padding: 2px 0;
+}

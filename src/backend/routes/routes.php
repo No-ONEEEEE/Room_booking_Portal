@@ -5,6 +5,7 @@ require_once __DIR__ . '/room.routes.php';
 require_once __DIR__ . '/booking.routes.php';
 require_once __DIR__ . '/feedback.routes.php';
 require_once __DIR__ . '/user.routes.php';
+require_once __DIR__ . '/notification.routes.php';
 
 function dispatch($method, $path, $input, $query, $pdo) {
     if ($method === "GET" && $path === "/health") {
@@ -36,7 +37,8 @@ function dispatch($method, $path, $input, $query, $pdo) {
         'roomRoutes',
         'bookingRoutes',
         'feedbackRoutes',
-        'userRoutes'
+        'userRoutes',
+        'registerNotificationRoutes'
     ];
 
     foreach ($routers as $router) {

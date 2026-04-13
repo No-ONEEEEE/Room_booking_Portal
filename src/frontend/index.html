@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rook | Advanced Room Booking Platform</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/notifications.css">
 
     <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -57,6 +58,9 @@
                 <a href="#" class="nav-item" data-view="my-bookings">
                     <i class="fas fa-calendar-alt"></i> <span>My Schedule</span>
                 </a>
+                <a href="#" class="nav-item" data-view="search-rooms">
+                    <i class="fas fa-search"></i> <span>Search Rooms</span>
+                </a>
                 <a href="#" class="nav-item admin-only hidden" data-view="admin">
                     <i class="fas fa-user-shield"></i> <span>Admin Panel</span>
                 </a>
@@ -82,9 +86,30 @@
 
             <!-- Dashboard View -->
             <section id="view-dashboard" class="page-view fade-in">
-                <div class="dashboard-header">
-                    <h1 id="dashboard-title">Command Center</h1>
-                    <p id="dashboard-desc" class="text-secondary">Overview of system status and room utilization.</p>
+                <div class="dashboard-header"
+                    style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h1 id="dashboard-title">Command Center</h1>
+                        <p id="dashboard-desc" class="text-secondary">Overview of system status and room utilization.
+                        </p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="notifications-wrapper" id="notifications-wrapper">
+                            <button class="btn-icon" id="btn-notifications" title="Notifications">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge hidden" id="notification-unread-count">0</span>
+                            </button>
+                            <div class="notifications-dropdown hidden" id="notifications-dropdown">
+                                <div class="notifications-header">
+                                    <span>Notifications</span>
+                                    <button id="btn-mark-all-read">Mark all as read</button>
+                                </div>
+                                <div class="notifications-list" id="notifications-list">
+                                    <p class="notification-empty">Loading notifications...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="stats-grid">
@@ -164,7 +189,8 @@
                         </div>
                         <div class="input-group">
                             <label>Participants</label>
-                            <div id="book-participants-list" style="max-height: 150px; overflow-y: auto; background: var(--glass-bg); padding: 0.5rem; border: 1px solid var(--border-glass); border-radius: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div id="book-participants-list"
+                                style="max-height: 150px; overflow-y: auto; background: var(--glass-bg); padding: 0.5rem; border: 1px solid var(--border-glass); border-radius: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
                                 <!-- Checkboxes injected here -->
                             </div>
                         </div>
@@ -172,11 +198,14 @@
                             <label>Remarks</label>
                             <textarea id="book-remarks" rows="3" placeholder="Additional notes..."></textarea>
                         </div>
-                        <div class="input-group" style="flex-direction: row; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <div class="input-group"
+                            style="flex-direction: row; align-items: center; gap: 0.5rem; cursor: pointer;">
                             <input type="checkbox" id="book-snacks-requested" style="width: auto;">
                             <label style="margin-bottom: 0;">Request refreshments</label>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="btn-check-availability" style="margin-top: 1rem; width: 100%; justify-content: center;">Check Available Rooms</button>
+                        <button type="submit" class="btn btn-primary" id="btn-check-availability"
+                            style="margin-top: 1rem; width: 100%; justify-content: center;">Check Available
+                            Rooms</button>
                     </form>
                 </div>
 
@@ -228,6 +257,62 @@
                 <div id="schedule-calendar-view" class="hidden">
                     <div class="glass-card">
                         <div id="calendar"></div>
+                    </div>
+                </div>
+            </section>
+            <!-- Search Rooms View -->
+            <section id="view-search-rooms" class="page-view hidden fade-in">
+                <div class="dashboard-header">
+                    <h1>Search Rooms</h1>
+                    <p class="text-secondary">Search for a room to view its availability calendar.</p>
+                </div>
+
+                <div class="glass-card" style="margin-bottom: 2rem;">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; align-items: flex-end;">
+                        <div class="input-group" style="margin-bottom: 0;">
+                            <label>Room Name</label>
+                            <input type="text" id="search-room-name" placeholder="Search by name...">
+                        </div>
+                        <div class="input-group" style="margin-bottom: 0;">
+                            <label>Type</label>
+                            <select id="search-room-type">
+                                <option value="">Any Type</option>
+                                <option value="meeting">Meeting Room</option>
+                                <option value="classroom">Classroom Area</option>
+                                <option value="conference">Conference</option>
+                                <option value="lab">Lab</option>
+                            </select>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 0;">
+                            <label>Min Capacity</label>
+                            <input type="number" id="search-room-capacity" min="0" placeholder="e.g. 10">
+                        </div>
+                    </div>
+
+                    <div id="search-results-list" class="hidden"
+                        style="margin-top: 1.5rem; max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 0.75rem; border: 1px solid var(--border-glass);">
+                        <!-- Result items injected here -->
+                    </div>
+                </div>
+
+                <div id="room-schedule-container" class="hidden">
+                    <div class="glass-card">
+                        <div id="room-calendar"></div>
+                        <div class="calendar-legend"
+                            style="margin-top: 1.5rem; display: flex; gap: 1.5rem; font-size: 0.85rem; padding-top: 1rem; border-top: 1px solid var(--border-glass);">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div
+                                    style="width: 12px; height: 12px; border-radius: 2px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444;">
+                                </div>
+                                <span>Occupied / Booked</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div
+                                    style="width: 12px; height: 12px; border-radius: 2px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981;">
+                                </div>
+                                <span>Available</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -392,10 +477,12 @@
     <!-- View Room Feedback Modal -->
     <div id="view-room-feedback-modal" class="hidden"
         style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
-        <div class="glass-card" style="width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column;">
+        <div class="glass-card"
+            style="width: 100%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h2 id="room-feedback-title">Room Feedback</h2>
-                <button type="button" class="btn" style="background: rgba(255,255,255,0.1); padding: 0.5rem;" onclick="closeRoomFeedbackModal()">
+                <button type="button" class="btn" style="background: rgba(255,255,255,0.1); padding: 0.5rem;"
+                    onclick="closeRoomFeedbackModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>

@@ -1,0 +1,83 @@
+/* ROOK - Feedback: Star Rating, Feedback Cards, Empty State */
+
+/* --- Star Rating --- */
+.star-rating {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.star-rating .fa-star {
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.star-rating .fa-star:hover,
+.star-rating .fa-star.active {
+    color: #f59e0b;
+    transform: scale(1.15);
+}
+
+.star-rating .fa-star.hovered {
+    color: #fbbf24;
+}
+
+/* --- Admin Feedback Cards --- */
+.feedback-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    transition: var(--transition);
+}
+
+.feedback-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.feedback-stars {
+    color: #f59e0b;
+    font-size: 0.9rem;
+}
+
+.feedback-stars .fa-star.empty {
+    color: var(--text-dim);
+}
+
+.feedback-meta {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+.feedback-comment {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-top: 0.4rem;
+}
+
+/* --- Empty State --- */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-dim);
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 0.95rem;
+}

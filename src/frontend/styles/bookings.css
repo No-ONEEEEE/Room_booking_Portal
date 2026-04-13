@@ -1,0 +1,178 @@
+/* ROOK - Bookings: Schedule Toggle, Status Tabs, Booking Cards */
+
+/* --- Schedule View Toggle --- */
+.schedule-view-toggle {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+}
+
+.view-toggle-btn {
+    padding: 0.6rem 1.25rem;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: 'Inter', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.view-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.view-toggle-btn.active {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-indigo));
+    color: white;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+}
+
+/* --- Booking Status Tabs --- */
+.booking-status-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-glass);
+    border-radius: 14px;
+    flex-wrap: wrap;
+}
+
+.status-tab {
+    padding: 0.6rem 1.25rem;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: 'Inter', sans-serif;
+}
+
+.status-tab:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.status-tab.active {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-indigo));
+    color: white;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+}
+
+/* --- Booking Cards --- */
+.bookings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.booking-card {
+    background: var(--bg-card);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+    gap: 1rem;
+}
+
+.booking-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(30, 41, 59, 0.9);
+}
+
+.booking-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.booking-card-info h4 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    font-family: 'Outfit', sans-serif;
+}
+
+.booking-card-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-top: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.booking-card-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.booking-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    align-items: center;
+}
+
+.btn-cancel {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-cancel:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+.btn-complete {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.btn-complete:hover {
+    background: rgba(16, 185, 129, 0.25);
+}
+
+.btn-feedback {
+    background: rgba(168, 85, 247, 0.15);
+    color: #a855f7;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.btn-feedback:hover {
+    background: rgba(168, 85, 247, 0.25);
+}
+
+/* Additional Status Badges */
+.status-completed {
+    background: rgba(56, 189, 248, 0.2);
+    color: var(--accent-blue);
+}
+
+.status-declined {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--status-declined);
+}
+
+.status-cancelled {
+    background: rgba(107, 114, 128, 0.2);
+    color: var(--status-cancelled);
+}

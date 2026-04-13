@@ -1,0 +1,106 @@
+/* ROOK - Forms: Buttons, Inputs, Filter Bar */
+
+/* --- Filter Bar --- */
+.filter-bar {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 200px;
+}
+
+.filter-group label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+}
+
+.filter-bar select,
+.filter-bar input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    color: white;
+    font-size: 0.9rem;
+}
+
+/* Fix dropdown option text color on native selects */
+select option {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+/* --- Buttons --- */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-indigo));
+    color: white;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+    box-shadow: var(--shadow-glow);
+}
+
+.btn-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--text-dim) !important;
+    box-shadow: none !important;
+}
+
+/* --- Input Groups --- */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.input-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+input,
+select,
+textarea {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    color: white;
+    width: 100%;
+    outline: none;
+    transition: var(--transition);
+}
+
+input:focus {
+    border-color: var(--accent-blue);
+    background: rgba(255, 255, 255, 0.08);
+}

@@ -1,6 +1,7 @@
 <?php
 
-function roomRoutes($method, $path, $input, $query, $pdo) {
+function roomRoutes($method, $path, $input, $query, $pdo)
+{
 
     $rooms = new RoomController($pdo);
 
@@ -28,7 +29,7 @@ function roomRoutes($method, $path, $input, $query, $pdo) {
     }
 
     if ($method === "GET" && preg_match('#^/rooms/(\d+)/availability$#', $path, $matches)) {
-        $roomId = (int)$matches[1];
+        $roomId = (int) $matches[1];
 
         return $rooms->checkAvailability(
             $roomId,
@@ -38,17 +39,27 @@ function roomRoutes($method, $path, $input, $query, $pdo) {
     }
 
     if ($method === "GET" && preg_match("#^/rooms/(\d+)$#", $path, $matches)) {
-        $roomId = (int)$matches[1];
+        $roomId = (int) $matches[1];
         return $rooms->getById($roomId);
     }
 
     if ($method === "GET" && preg_match('#^/rooms/(\d+)/feedback$#', $path, $matches)) {
         $authError = requireAuth();
-        if ($authError) return $authError;
+        if ($authError)
+            return $authError;
 
-        $roomId = (int)$matches[1];
+        $roomId = (int) $matches[1];
 
         return $rooms->getFeedback($roomId);
+    }
+
+    if ($method === "GET" && preg_match('#^/rooms/(\d+)/bookings$#', $path, $matches)) {
+        $authError = requireAuth();
+        if ($authError)
+            return $authError;
+
+        $roomId = (int) $matches[1];
+        return $rooms->getRoomBookings($roomId);
     }
 
     return null;

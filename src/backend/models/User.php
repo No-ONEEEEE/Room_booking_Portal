@@ -1,13 +1,16 @@
 <?php
 
-class User {
+class User
+{
     private $pdo;
 
-    public function __construct($pdo) {
+    public function __construct($pdo)
+    {
         $this->pdo = $pdo;
     }
 
-    public function findById($id) {
+    public function findById($id)
+    {
         $stmt = $this->pdo->prepare("
             SELECT id, name, email, role
             FROM users
@@ -20,7 +23,8 @@ class User {
         return $user ?: null;
     }
 
-    public function findByEmail($email) {
+    public function findByEmail($email)
+    {
         $stmt = $this->pdo->prepare("
             SELECT id, name, email, role
             FROM users
@@ -33,11 +37,13 @@ class User {
         return $user ?: null;
     }
 
-    public function login($email) {
+    public function login($email)
+    {
         return $this->findByEmail($email);
     }
 
-    public function getAll($excludeUserId = null) {
+    public function getAll($excludeUserId = null)
+    {
         $query = "
             SELECT id, name, email
             FROM users
@@ -56,6 +62,17 @@ class User {
         $stmt = $this->pdo->prepare($query);
         $stmt->execute($params);
 
+        return $stmt->fetchAll();
+    }
+
+    public function getAdmins()
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT id, name, email
+            FROM users
+            WHERE role = 'admin'
+        ");
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 }
