@@ -6,7 +6,7 @@
 import API from '../api.js';
 import state from './state.js';
 import { refreshAppData } from '../app.js';
-import { initCharts } from './dashboard.js';
+import { initCharts, startStatsAutoRefresh } from './dashboard.js';
 import { initCalendar } from './calendar.js';
 import { initBookRoomForm } from './rooms.js';
 
@@ -54,12 +54,14 @@ export async function handleLoginSuccess(user) {
     const dTitle = document.getElementById('dashboard-title');
     const dDesc = document.getElementById('dashboard-desc');
     if (user.role === 'admin') {
-        dTitle.textContent = "Command Center";
-        dDesc.textContent = "Overview of system status and room utilization.";
+        dTitle.textContent = "Statistics";
+        dDesc.textContent = "";
+        dDesc.style.display = 'none';
     } else {
         const firstName = user.name ? user.name.split(' ')[0] : 'User';
         dTitle.textContent = `Welcome, ${firstName}`;
         dDesc.textContent = "Review your upcoming schedules and reserve new high-tech spaces.";
+        dDesc.style.display = '';
     }
 
     // Admin features visibility
@@ -77,6 +79,7 @@ export async function handleLoginSuccess(user) {
     await refreshAppData();
     initCharts();
     initCalendar();
+    startStatsAutoRefresh();
     initLogout();
 }
 

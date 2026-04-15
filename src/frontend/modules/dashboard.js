@@ -13,6 +13,15 @@ const MONTH_NAMES = [
 let statsFiltersInitialized = false;
 let statsRefreshIntervalId = null;
 
+const STATUS_LABELS = ['pending', 'approved', 'completed', 'declined', 'cancelled'];
+const STATUS_COLORS = {
+    pending: '#f59e0b',
+    approved: '#22c55e',
+    completed: '#38bdf8',
+    declined: '#ef4444',
+    cancelled: '#6b7280'
+};
+
 function parseBookingDate(value) {
     const parsed = new Date(String(value).replace(' ', 'T'));
     return Number.isNaN(parsed.getTime()) ? null : parsed;
@@ -122,6 +131,22 @@ function getSelectedDateRange() {
     return { start, end };
 }
 
+function getBookingsBySelectedFilters() {
+    const { start, end } = getSelectedDateRange();
+    const selectedRoomId = getSelectedRoomId();
+
+    return state.bookings.filter(b => {
+        const bookingStart = parseBookingDate(b.start_time);
+        const bookingEnd = parseBookingDate(b.end_time);
+
+        if (!bookingStart || !bookingEnd) return false;
+
+        if (selectedRoomId !== null && b.room_id !== selectedRoomId) return false;
+
+        return bookingStart < end && bookingEnd >= start;
+    });
+}
+
 export function renderActivity() {
     const container = document.getElementById('activity-feed');
     if (!container) return;
@@ -148,19 +173,7 @@ export function updateStats() {
     const availableRooms = document.getElementById('stat-available-rooms');
     const occupiedRooms = document.getElementById('stat-occupied-rooms');
 
-    const { start, end } = getSelectedDateRange();
-    const selectedRoomId = getSelectedRoomId();
-
-    const bookingsInRange = state.bookings.filter(b => {
-        const bookingStart = parseBookingDate(b.start_time);
-        const bookingEnd = parseBookingDate(b.end_time);
-
-        if (!bookingStart || !bookingEnd) return false;
-
-        if (selectedRoomId !== null && b.room_id !== selectedRoomId) return false;
-
-        return bookingStart < end && bookingEnd >= start;
-    });
+    const bookingsInRange = getBookingsBySelectedFilters();
 
     const acceptedBookingsInRange = bookingsInRange.filter(
         b => b.status === 'approved' || b.status === 'completed'
@@ -192,6 +205,8 @@ export function updateStats() {
     if (activeBookings) activeBookings.textContent = allActiveBookingsCount;
     if (availableRooms) availableRooms.textContent = availableCount;
     if (occupiedRooms) occupiedRooms.textContent = occupiedCount;
+
+    updateBookingAnalytics(bookingsInRange);
 }
 
 export function startStatsAutoRefresh() {
@@ -203,30 +218,56 @@ export function startStatsAutoRefresh() {
 }
 
 export function initCharts() {
+    updateBookingAnalytics(getBookingsBySelectedFilters());
+}
+
+function updateBookingAnalytics(filteredBookings) {
     const canvas = document.getElementById('usageChart');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (state.charts.usage) state.charts.usage.destroy();
 
+    const statusCounts = STATUS_LABELS.reduce((acc, status) => {
+        acc[status] = 0;
+        return acc;
+    }, {});
+
+    filteredBookings.forEach(booking => {
+        if (Object.hasOwn(statusCounts, booking.status)) {
+            statusCounts[booking.status] += 1;
+        }
+    });
+
+    const values = STATUS_LABELS.map(status => statusCounts[status]);
+    const labels = STATUS_LABELS.map(
+        status => `${status.charAt(0).toUpperCase()}${status.slice(1)}`
+    );
+
     state.charts.usage = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            labels,
             datasets: [{
-                label: 'Room Usage (%)',
-                data: [65, 78, 92, 85, 95, 40, 30],
-                borderColor: '#38bdf8',
-                backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                tension: 0.4,
-                fill: true
+                label: 'Bookings by Status',
+                data: values,
+                backgroundColor: STATUS_LABELS.map(status => STATUS_COLORS[status]),
+                borderRadius: 6,
+                borderSkipped: false
             }]
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: false } },
+            plugins: {
+                legend: { display: false }
+            },
             scales: {
-                y: { grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false }, ticks: { color: '#94a3b8' } },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    border: { display: false },
+                    ticks: { color: '#94a3b8', precision: 0 }
+                },
                 x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
             }
         }
