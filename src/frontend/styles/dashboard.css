@@ -22,6 +22,45 @@
     gap: 0.5rem;
 }
 
+.stat-card--filters {
+    justify-content: center;
+}
+
+.stats-filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.stats-filters select {
+    width: 100%;
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-glass);
+    border-radius: 10px;
+    padding: 0.55rem 0.7rem;
+    font-size: 0.9rem;
+}
+
+.stat-card--combined {
+    gap: 0.8rem;
+}
+
+.stat-combined-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+}
+
+.stat-card--combined .stat-label {
+    margin-bottom: 0;
+}
+
+.stat-card--combined .stat-value {
+    font-size: 1.65rem;
+}
+
 .stat-value {
     font-size: 2rem;
     font-weight: 700;
@@ -55,4 +94,10 @@
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .stats-filters {
+        grid-template-columns: 1fr;
+    }
 }

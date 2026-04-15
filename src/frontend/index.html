@@ -113,13 +113,22 @@
                 </div>
 
                 <div class="stats-grid">
-                    <div class="glass-card stat-card">
-                        <span class="stat-label">Total Booking Requests</span>
-                        <span class="stat-value stat-value--primary" id="stat-total-requests">0</span>
+                    <div class="glass-card stat-card stat-card--filters">
+                        <span class="stat-label">View Stats For</span>
+                        <div class="stats-filters">
+                            <select id="stat-month-select" aria-label="Select month"></select>
+                            <select id="stat-year-select" aria-label="Select year"></select>
+                        </div>
                     </div>
-                    <div class="glass-card stat-card">
-                        <span class="stat-label">Active Bookings</span>
-                        <span class="stat-value stat-value--success" id="stat-active-bookings">0</span>
+                    <div class="glass-card stat-card stat-card--combined">
+                        <div class="stat-combined-row">
+                            <span class="stat-label">Total Booking Requests</span>
+                            <span class="stat-value stat-value--primary" id="stat-total-requests">0</span>
+                        </div>
+                        <div class="stat-combined-row">
+                            <span class="stat-label">Active Bookings</span>
+                            <span class="stat-value stat-value--success" id="stat-active-bookings">0</span>
+                        </div>
                     </div>
                     <div class="glass-card stat-card">
                         <span class="stat-label">Available Rooms</span>
