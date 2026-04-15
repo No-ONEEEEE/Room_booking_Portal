@@ -3,7 +3,7 @@
  * Handles all fetch requests to the PHP backend.
  */
 
-const API_BASE_URL = '/backend/public';
+const API_BASE_URL = '../backend/public';
 
 /**
  * Enhanced Fetch Wrapper

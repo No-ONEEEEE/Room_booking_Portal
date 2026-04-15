@@ -14,6 +14,7 @@ function seedDatabase($pdo) {
         $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
         $pdo->exec("TRUNCATE TABLE feedback");
         $pdo->exec("TRUNCATE TABLE booking_guests");
+        $pdo->exec("TRUNCATE TABLE notifications");
         $pdo->exec("TRUNCATE TABLE bookings");
         $pdo->exec("TRUNCATE TABLE users");
         $pdo->exec("TRUNCATE TABLE rooms");
@@ -76,27 +77,47 @@ function seedDatabase($pdo) {
 
         echo "Seeding rooms...\n";
 
-        $rooms = [
-            ['Conference Room A','meeting',20],
-            ['Conference Room B','meeting',15],
-            ['Conference Room C','meeting',10],
-            ['Board Room','meeting',30],
-            ['Executive Suite','meeting',8],
-            ['Classroom 101','classroom',40],
-            ['Classroom 102','classroom',35],
-            ['Classroom 103','classroom',30],
-            ['Classroom 104','classroom',25],
-            ['Seminar Room','classroom',50],
-            ['Training Lab','classroom',20],
-            ['Studio A','meeting',12],
-            ['Studio B','meeting',12],
-            ['Auditorium','classroom',100],
-            ['Small Meeting Room','meeting',6],
-            ['Medium Board Room','meeting',18],
-            ['Large Classroom','classroom',60],
-            ['Workshop Room','classroom',28],
-            ['Focus Room 1','meeting',4],
-            ['Focus Room 2','meeting',4]
+        $roomNames = [
+            'KRB Faculty Meeting Room',
+            'KRB CVIT Conference Hall (Big)',
+            'KRB LTRC Conference Hall (Big)',
+            'H 105',
+            'H 205',
+            'KRB Video Conference Room ',
+            'KRB LTRC Conference Room (Small)',
+            'KRB CVIT Conference Room (Small)',
+            'A1-101',
+            'A3-117',
+            'Admin Meeting Room ',
+            'Seminar Hall 1 (SH1)',
+            'KRB Auditorium',
+            'Saranga Hall 119',
+            'H 101',
+            'H 102',
+            'H 103',
+            'H 104',
+            'H 201',
+            'H 202',
+            'H 203',
+            'H 204',
+            'H 301',
+            'H 302',
+            'H 303',
+            'H 304',
+            'B4 301',
+            'B4 304',
+            'CR 1',
+            'A3 301',
+            'B6 309',
+            '319',
+            '303',
+            'Evaluation Room 1',
+            'Evaluation Room 2',
+            'B3-204 (eSagu)',
+            'EERC Conference Room',
+            'DISANET VC Room',
+            'Outreach Meeting Room',
+            'KRB Exhibition Hall'
         ];
 
         $roomIds = [];
@@ -106,8 +127,9 @@ function seedDatabase($pdo) {
             VALUES (?,?,?)
         ");
 
-        foreach ($rooms as $room) {
-            $stmtRoom->execute($room);
+        foreach ($roomNames as $roomName) {
+            $type = rand(0,1) ? 'meeting' : 'classroom';
+            $stmtRoom->execute([$roomName, $type, 200]);
             $roomIds[] = $pdo->lastInsertId();
         }
 
@@ -157,6 +179,7 @@ function seedDatabase($pdo) {
 
         $now = new DateTime();
         $bookingCount = 0;
+        $bookingIds = [];
 
         for ($i = 0; $i < 150; $i++) {
 
@@ -278,6 +301,53 @@ function seedDatabase($pdo) {
 
         echo "Created $feedbackCount feedback entries\n";
 
+        /*
+        =========================
+        NOTIFICATIONS
+        =========================
+        */
+
+        echo "Seeding notifications...\n";
+
+        $notificationMessages = [
+            'Your booking has been approved.',
+            'Your booking request has been declined.',
+            'Your booking is pending approval.',
+            'A reminder for your upcoming booking.',
+            'Please update your booking details.',
+            'Booking clarification required.',
+            'Room maintenance notice for your scheduled booking.'
+        ];
+
+        $notificationTypes = ['info', 'warning', 'alert', 'update'];
+        $stmtNotification = $pdo->prepare(
+            "INSERT INTO notifications (user_id, booking_id, message, type, is_read) VALUES (?, ?, ?, ?, ?)"
+        );
+
+        $notificationCount = 0;
+        foreach ($bookingIds as $bookingId) {
+            if (rand(0, 100) < 50) {
+                $userId = $userIds[array_rand($userIds)];
+                $message = $notificationMessages[array_rand($notificationMessages)];
+                $type = $notificationTypes[array_rand($notificationTypes)];
+                $isRead = rand(0, 1);
+                $stmtNotification->execute([$userId, $bookingId, $message, $type, $isRead]);
+                $notificationCount++;
+            }
+        }
+
+        for ($i = 0; $i < 20; $i++) {
+            if (rand(0, 100) < 30) {
+                $userId = $userIds[array_rand($userIds)];
+                $message = $notificationMessages[array_rand($notificationMessages)];
+                $type = $notificationTypes[array_rand($notificationTypes)];
+                $isRead = rand(0, 1);
+                $stmtNotification->execute([$userId, null, $message, $type, $isRead]);
+                $notificationCount++;
+            }
+        }
+
+        echo "Created $notificationCount notifications\n";
 
         $pdo->commit();
         $pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
@@ -289,6 +359,7 @@ function seedDatabase($pdo) {
         echo "Rooms: ".count($roomIds)."\n";
         echo "Bookings: $bookingCount\n";
         echo "Feedback: $feedbackCount\n";
+        echo "Notifications: $notificationCount\n";
 
     }
 
