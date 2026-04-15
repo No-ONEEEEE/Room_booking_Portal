@@ -11,7 +11,7 @@
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: minmax(420px, 1.6fr) minmax(380px, 1.4fr);
     gap: 1.5rem;
     margin-bottom: 2.5rem;
 }
@@ -24,7 +24,7 @@
 
 .stats-filters {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
     gap: 0.75rem;
 }
 
@@ -44,6 +44,14 @@
 
 .stat-card--combined > .stat-label {
     margin-bottom: 0.25rem;
+}
+
+.stat-card--filters-wide {
+    grid-column: span 1;
+}
+
+.stat-card--rooms-wide {
+    grid-column: span 1;
 }
 
 .stat-combined-row {
@@ -97,6 +105,10 @@
 }
 
 @media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
     .stats-filters {
         grid-template-columns: 1fr;
     }
