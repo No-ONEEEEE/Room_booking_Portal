@@ -28,6 +28,22 @@
     color: var(--accent-blue);
 }
 
+.stat-value--primary {
+    color: var(--accent-blue);
+}
+
+.stat-value--success {
+    color: var(--status-approved);
+}
+
+.stat-value--info {
+    color: #38bdf8;
+}
+
+.stat-value--warning {
+    color: var(--status-pending);
+}
+
 .stat-label {
     color: var(--text-secondary);
     font-size: 0.875rem;
