@@ -105,8 +105,19 @@ export function updateStats() {
 
     const approvedBookings = bookingsInRange.filter(b => b.status === 'approved');
 
+    const now = new Date();
     const currentlyOccupiedRoomIds = new Set(
-        approvedBookings
+        state.bookings
+            .filter(b => {
+                if (b.status !== 'approved') return false;
+
+                const bookingStart = parseBookingDate(b.start_time);
+                const bookingEnd = parseBookingDate(b.end_time);
+
+                if (!bookingStart || !bookingEnd) return false;
+
+                return bookingStart <= now && bookingEnd >= now;
+            })
             .map(b => b.room_id)
     );
 

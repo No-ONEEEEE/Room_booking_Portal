@@ -22,10 +22,6 @@
     gap: 0.5rem;
 }
 
-.stat-card--filters {
-    justify-content: center;
-}
-
 .stats-filters {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -44,6 +40,10 @@
 
 .stat-card--combined {
     gap: 0.8rem;
+}
+
+.stat-card--combined > .stat-label {
+    margin-bottom: 0.25rem;
 }
 
 .stat-combined-row {
