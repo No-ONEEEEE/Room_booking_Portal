@@ -22,13 +22,35 @@ export function renderActivity() {
 }
 
 export function updateStats() {
-    const totalRooms = document.getElementById('stat-total-rooms');
+    const totalRequests = document.getElementById('stat-total-requests');
     const activeBookings = document.getElementById('stat-active-bookings');
-    const pendingRequests = document.getElementById('stat-pending-requests');
+    const availableRooms = document.getElementById('stat-available-rooms');
+    const occupiedRooms = document.getElementById('stat-occupied-rooms');
 
-    if (totalRooms) totalRooms.textContent = state.rooms.length;
-    if (activeBookings) activeBookings.textContent = state.bookings.filter(b => b.status === 'approved').length;
-    if (pendingRequests) pendingRequests.textContent = state.bookings.filter(b => b.status === 'pending').length;
+    const now = new Date();
+
+    const approvedBookings = state.bookings.filter(b => b.status === 'approved');
+
+    const currentlyOccupiedRoomIds = new Set(
+        approvedBookings
+            .filter(b => {
+                const start = new Date(String(b.start_time).replace(' ', 'T'));
+                const end = new Date(String(b.end_time).replace(' ', 'T'));
+                return !Number.isNaN(start.getTime())
+                    && !Number.isNaN(end.getTime())
+                    && start <= now
+                    && end >= now;
+            })
+            .map(b => b.room_id)
+    );
+
+    const occupiedCount = currentlyOccupiedRoomIds.size;
+    const availableCount = Math.max(state.rooms.length - occupiedCount, 0);
+
+    if (totalRequests) totalRequests.textContent = state.bookings.length;
+    if (activeBookings) activeBookings.textContent = approvedBookings.length;
+    if (availableRooms) availableRooms.textContent = availableCount;
+    if (occupiedRooms) occupiedRooms.textContent = occupiedCount;
 }
 
 export function initCharts() {
