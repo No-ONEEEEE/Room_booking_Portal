@@ -38,6 +38,7 @@ CREATE TABLE bookings (
     remarks TEXT,
 
     snacks_requested BOOLEAN DEFAULT FALSE,
+    refreshment_details JSON DEFAULT NULL,
 
     status ENUM(
         'pending',

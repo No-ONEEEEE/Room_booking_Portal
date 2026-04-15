@@ -72,6 +72,15 @@ export async function initBookRoomForm() {
                 <label for="user-${u.id}" style="margin: 0; cursor: pointer; text-align: left; flex: 1;">${u.name}</label>
             </div>
         `).join('');
+
+        // Refreshment toggle logic
+        const snacksCheckbox = document.getElementById('book-snacks-requested');
+        const refreshmentDetails = document.getElementById('refreshment-details');
+        if (snacksCheckbox && refreshmentDetails) {
+            snacksCheckbox.addEventListener('change', () => {
+                refreshmentDetails.classList.toggle('hidden', !snacksCheckbox.checked);
+            });
+        }
     } catch (error) {
         console.error("Failed to fetch users", error);
     }
@@ -88,7 +97,18 @@ window.proceedWithBooking = async (roomId) => {
         endTime: document.getElementById('book-end-time').value,
         remarks: document.getElementById('book-remarks').value,
         guests: guests,
-        snacksRequested: document.getElementById('book-snacks-requested').checked
+        snacksRequested: document.getElementById('book-snacks-requested').checked,
+        refreshmentDetails: document.getElementById('book-snacks-requested').checked ? {
+            tea: document.getElementById('refresh-tea').checked,
+            coffee: document.getElementById('refresh-coffee').checked,
+            snacks: document.getElementById('refresh-snacks').checked,
+            lunch: document.getElementById('refresh-lunch').checked,
+            onTable: document.getElementById('refresh-ontable').checked,
+            quantity: document.getElementById('refresh-quantity').value,
+            time: document.getElementById('refresh-time').value,
+            budget: document.getElementById('refresh-budget').value,
+            remarks: document.getElementById('refresh-remarks').value
+        } : null
     };
 
     try {

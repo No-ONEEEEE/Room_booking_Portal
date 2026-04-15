@@ -72,6 +72,7 @@ export function renderBookingsList() {
                         <span><i class="fas fa-door-open"></i> ${b.room_name || 'Room #' + b.room_id}</span>
                         <span><i class="fas fa-calendar"></i> ${startDate.toLocaleDateString()}</span>
                         <span><i class="fas fa-clock"></i> ${startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} – ${endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        ${b.snacks_requested ? `<span style="color: var(--accent-blue); display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 500; margin-top: 0.25rem;"><i class="fas fa-coffee"></i> Refreshments Requested</span>` : ''}
                     </div>
                 </div>
                 <div class="booking-card-actions">

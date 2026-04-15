@@ -23,6 +23,7 @@ function bookingRoutes($method, $path, $input, $query, $pdo) {
                     $input['purpose'] ?? null,
                     $input['expectedPeople'] ?? null,
                     $input['snacksRequested'] ?? false,
+                    $input['refreshmentDetails'] ?? null,
                     $input['remarks'] ?? null,
                     $input['guests'] ?? []
                 );
@@ -149,6 +150,7 @@ function bookingRoutes($method, $path, $input, $query, $pdo) {
             $input['purpose'] ?? null,
             $input['expectedPeople'] ?? null,
             $input['snacksRequested'] ?? null,
+            $input['refreshmentDetails'] ?? null,
             $input['remarks'] ?? null,
             $input['guests'] ?? null
         );

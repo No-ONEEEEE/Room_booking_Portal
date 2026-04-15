@@ -7,7 +7,7 @@ import API from './api.js';
 import state from './modules/state.js';
 import { renderActivity, updateStats, initCharts } from './modules/dashboard.js';
 import { renderBookingsList, initBookingStatusTabs, initBookingListeners } from './modules/bookings.js';
-import { renderRooms, renderRoomsForBooking, initFilterListeners } from './modules/rooms.js';
+import { renderRooms, renderRoomsForBooking, initFilterListeners, initBookRoomForm } from './modules/rooms.js';
 import { refreshAdminData, initAdminForm } from './modules/admin.js';
 import { initAuth } from './modules/auth.js';
 import { initNavigation } from './modules/navigation.js';
@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initFeedbackForm();
     initNotifications();
     initSearchRooms();
+    initBookRoomForm();
 });
 
 // --- App-level Data Refresh ---

@@ -23,6 +23,7 @@ class Booking {
                 b.expected_people,
                 b.remarks,
                 b.snacks_requested,
+                b.refreshment_details,
                 b.status,
                 b.decline_reason,
                 b.clarification_notes,
@@ -71,6 +72,7 @@ class Booking {
         $purpose,
         $expectedPeople,
         $snacksRequested = false,
+        $refreshmentDetails = null,
         $remarks = null,
         $guests = []
     ) {
@@ -142,9 +144,10 @@ class Booking {
                     expected_people,
                     remarks,
                     snacks_requested,
+                    refreshment_details,
                     status
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
             ");
 
             $stmt->execute([
@@ -155,7 +158,8 @@ class Booking {
                 $purpose,
                 $expectedPeople,
                 $remarks,
-                $snacksRequested ? 1 : 0
+                $snacksRequested ? 1 : 0,
+                $refreshmentDetails ? json_encode($refreshmentDetails) : null
             ]);
 
             $bookingId = (int)$this->pdo->lastInsertId();
@@ -343,6 +347,7 @@ class Booking {
                 b.purpose,
                 b.expected_people,
                 b.snacks_requested,
+                b.refreshment_details,
                 b.status,
 
                 u.id AS user_id,
@@ -479,6 +484,7 @@ class Booking {
         $purpose = null,
         $expectedPeople = null,
         $snacksRequested = null,
+        $refreshmentDetails = null,
         $remarks = null,
         $guests = null
     ) {
@@ -570,6 +576,11 @@ class Booking {
             if ($remarks !== null) {
                 $fields[] = "remarks = ?";
                 $params[] = $remarks;
+            }
+            
+            if ($refreshmentDetails !== null) {
+                $fields[] = "refreshment_details = ?";
+                $params[] = $refreshmentDetails ? json_encode($refreshmentDetails) : null;
             }
 
             if ($resetApproval) {

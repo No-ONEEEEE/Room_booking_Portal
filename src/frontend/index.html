@@ -203,6 +203,54 @@
                             <input type="checkbox" id="book-snacks-requested" style="width: auto;">
                             <label style="margin-bottom: 0;">Request refreshments</label>
                         </div>
+
+                        <!-- Expanded Refreshment Options -->
+                        <div id="refreshment-details" class="hidden" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: 12px; margin-bottom: 1.5rem; margin-top: -0.5rem; animation: slideDown 0.3s ease-out;">
+                            <p style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-blue); margin-bottom: 1rem; font-weight: 600;">Service Details</p>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="refresh-tea" style="width: auto; cursor: pointer;">
+                                    <label for="refresh-tea" style="margin: 0; font-size: 0.9rem; cursor: pointer;">Tea</label>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="refresh-coffee" style="width: auto; cursor: pointer;">
+                                    <label for="refresh-coffee" style="margin: 0; font-size: 0.9rem; cursor: pointer;">Coffee</label>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="refresh-snacks" style="width: auto; cursor: pointer;">
+                                    <label for="refresh-snacks" style="margin: 0; font-size: 0.9rem; cursor: pointer;">Snacks</label>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="refresh-lunch" style="width: auto; cursor: pointer;">
+                                    <label for="refresh-lunch" style="margin: 0; font-size: 0.9rem; cursor: pointer;">Working Lunch</label>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="refresh-ontable" style="width: auto; cursor: pointer;">
+                                    <label for="refresh-ontable" style="margin: 0; font-size: 0.9rem; cursor: pointer;">On-table refreshments</label>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="input-group">
+                                    <label>Quantity</label>
+                                    <input type="number" id="refresh-quantity" min="1" placeholder="e.g. 10">
+                                </div>
+                                <div class="input-group">
+                                    <label>Preferred Time</label>
+                                    <input type="time" id="refresh-time">
+                                </div>
+                                <div class="input-group">
+                                    <label>Estimated Budget</label>
+                                    <input type="text" id="refresh-budget" placeholder="e.g. 100">
+                                </div>
+                                <div class="input-group">
+                                    <label>Special Remarks</label>
+                                    <input type="text" id="refresh-remarks" placeholder="Any specific requirements...">
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn btn-primary" id="btn-check-availability"
                             style="margin-top: 1rem; width: 100%; justify-content: center;">Check Available
                             Rooms</button>

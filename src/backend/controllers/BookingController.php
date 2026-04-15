@@ -25,6 +25,7 @@ class BookingController
         $purpose,
         $expectedPeople,
         $snacksRequested = false,
+        $refreshmentDetails = null,
         $remarks = null,
         $guests = []
     ) {
@@ -100,6 +101,7 @@ class BookingController
             $purpose,
             $expectedPeople,
             $snacksRequested,
+            $refreshmentDetails,
             $remarks,
             $guests
         );
@@ -219,6 +221,7 @@ class BookingController
         $purpose = null,
         $expectedPeople = null,
         $snacksRequested = null,
+        $refreshmentDetails = null,
         $remarks = null,
         $guests = null
     ) {
@@ -312,6 +315,7 @@ class BookingController
             $purpose,
             $expectedPeople,
             $snacksRequested,
+            $refreshmentDetails,
             $remarks,
             $guests
         );

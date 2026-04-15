@@ -74,6 +74,7 @@ function renderAdminPending() {
         <tr>
             <td>
                 <div style="font-weight: 500;">${b.user_name}</div>
+                ${b.snacks_requested ? `<div style="font-size: 0.7rem; color: var(--accent-blue); margin-top: 0.25rem;"><i class="fas fa-coffee"></i> Refreshments</div>` : ''}
             </td>
             <td>${b.room_name}</td>
             <td>
