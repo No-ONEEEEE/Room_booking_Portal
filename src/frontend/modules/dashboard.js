@@ -26,6 +26,11 @@ function ensureStatsFilters() {
     if (!monthSelect || !yearSelect) return;
 
     if (!monthSelect.options.length) {
+        const allMonthsOption = document.createElement('option');
+        allMonthsOption.value = '';
+        allMonthsOption.textContent = 'All Months';
+        monthSelect.appendChild(allMonthsOption);
+
         MONTH_NAMES.forEach((month, index) => {
             const option = document.createElement('option');
             option.value = String(index);
@@ -45,7 +50,7 @@ function ensureStatsFilters() {
     }
 
     const now = new Date();
-    monthSelect.value = String(now.getMonth());
+    monthSelect.value = '';
     yearSelect.value = String(now.getFullYear());
 
     monthSelect.addEventListener('change', updateStats);
@@ -59,8 +64,15 @@ function getSelectedDateRange() {
     const monthSelect = document.getElementById('stat-month-select');
     const yearSelect = document.getElementById('stat-year-select');
 
-    const selectedMonth = monthSelect ? parseInt(monthSelect.value, 10) : now.getMonth();
     const selectedYear = yearSelect ? parseInt(yearSelect.value, 10) : now.getFullYear();
+
+    if (!monthSelect || monthSelect.value === '') {
+        const start = new Date(selectedYear, 0, 1, 0, 0, 0, 0);
+        const end = new Date(selectedYear + 1, 0, 1, 0, 0, 0, 0);
+        return { start, end };
+    }
+
+    const selectedMonth = parseInt(monthSelect.value, 10);
 
     const start = new Date(selectedYear, selectedMonth, 1, 0, 0, 0, 0);
     const end = new Date(selectedYear, selectedMonth + 1, 1, 0, 0, 0, 0);
