@@ -51,7 +51,7 @@ function seedDatabase($pdo) {
             ['Matthew Hall','matthew@example.com','user'],
             ['Karen Young','karen@example.com','user'],
             ['Admin User','admin@example.com','admin'],
-            ['Admin Two','admin2@example.com','admin']
+            ['Admin Two','reddymahanth438@gmail.com','admin']
         ];
 
         $userIds = [];
