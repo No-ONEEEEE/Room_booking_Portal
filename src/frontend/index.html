@@ -441,6 +441,57 @@
         </main>
     </div>
 
+    <!-- Booking Confirmation Modal -->
+    <div id="booking-confirm-modal" class="hidden booking-confirm-modal">
+        <div class="booking-confirm-card glass-card">
+            <div class="booking-confirm-header">
+                <div class="booking-confirm-icon">
+                    <i class="fas fa-circle-check"></i>
+                </div>
+                <div>
+                    <h2>Confirm Booking</h2>
+                    <p class="text-secondary">Please review these details before creating your request.</p>
+                </div>
+            </div>
+
+            <div class="booking-confirm-grid">
+                <div class="booking-confirm-item">
+                    <span class="booking-confirm-label">Room</span>
+                    <strong id="confirm-room-name">-</strong>
+                </div>
+                <div class="booking-confirm-item">
+                    <span class="booking-confirm-label">Type</span>
+                    <strong id="confirm-room-type">-</strong>
+                </div>
+                <div class="booking-confirm-item booking-confirm-item-wide">
+                    <span class="booking-confirm-label">Time Slot</span>
+                    <strong id="confirm-booking-slot">-</strong>
+                </div>
+                <div class="booking-confirm-item">
+                    <span class="booking-confirm-label">Purpose</span>
+                    <strong id="confirm-purpose">-</strong>
+                </div>
+                <div class="booking-confirm-item">
+                    <span class="booking-confirm-label">Expected Attendees</span>
+                    <strong id="confirm-attendees">-</strong>
+                </div>
+                <div class="booking-confirm-item">
+                    <span class="booking-confirm-label">Refreshments</span>
+                    <strong id="confirm-refreshments">-</strong>
+                </div>
+                <div class="booking-confirm-item booking-confirm-item-wide">
+                    <span class="booking-confirm-label">Remarks</span>
+                    <strong id="confirm-remarks">-</strong>
+                </div>
+            </div>
+
+            <div class="booking-confirm-actions">
+                <button type="button" id="confirm-booking-cancel" class="btn booking-confirm-cancel">Cancel</button>
+                <button type="button" id="confirm-booking-proceed" class="btn btn-primary">Proceed to Submit</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Booking Modal -->
     <!-- Admin Action Modal -->
     <div id="admin-modal" class="hidden"

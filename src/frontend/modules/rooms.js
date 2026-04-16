@@ -23,6 +23,130 @@ export function getRoomIcon(type) {
     return icons[type] || 'fa-door-open';
 }
 
+function isPreferredTimeWithinBookingWindow(startDateTime, endDateTime, preferredTime) {
+    if (!startDateTime || !endDateTime || !preferredTime) {
+        return true;
+    }
+
+    const start = new Date(startDateTime);
+    const end = new Date(endDateTime);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        return false;
+    }
+
+    const [hours, minutes] = preferredTime.split(':').map(Number);
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+        return false;
+    }
+
+    const preferred = new Date(start);
+    preferred.setHours(hours, minutes, 0, 0);
+
+    // If booking crosses midnight, allow preferred time on the next date too.
+    if (end > start && end.getDate() !== start.getDate() && preferred < start) {
+        preferred.setDate(preferred.getDate() + 1);
+    }
+
+    return preferred >= start && preferred <= end;
+}
+
+function buildBookingData(roomId) {
+    const guests = Array.from(document.querySelectorAll('input[name="participants[]"]:checked')).map(cb => parseInt(cb.value));
+    const snacksRequested = document.getElementById('book-snacks-requested').checked;
+
+    return {
+        roomId: roomId,
+        purpose: document.getElementById('book-purpose').value,
+        expectedPeople: parseInt(document.getElementById('book-expected-number').value),
+        startTime: document.getElementById('book-start-time').value,
+        endTime: document.getElementById('book-end-time').value,
+        remarks: document.getElementById('book-remarks').value,
+        guests: guests,
+        snacksRequested,
+        refreshmentDetails: snacksRequested ? {
+            tea: document.getElementById('refresh-tea').checked,
+            coffee: document.getElementById('refresh-coffee').checked,
+            snacks: document.getElementById('refresh-snacks').checked,
+            lunch: document.getElementById('refresh-lunch').checked,
+            onTable: document.getElementById('refresh-ontable').checked,
+            quantity: document.getElementById('refresh-quantity').value,
+            time: document.getElementById('refresh-time').value,
+            budget: document.getElementById('refresh-budget').value,
+            remarks: document.getElementById('refresh-remarks').value
+        } : null
+    };
+}
+
+function formatDateTimeForDisplay(value) {
+    if (!value) return '-';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+
+    return date.toLocaleString([], {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function showBookingConfirmationModal(room, bookingData) {
+    const modal = document.getElementById('booking-confirm-modal');
+    const roomName = document.getElementById('confirm-room-name');
+    const roomType = document.getElementById('confirm-room-type');
+    const bookingSlot = document.getElementById('confirm-booking-slot');
+    const purpose = document.getElementById('confirm-purpose');
+    const attendees = document.getElementById('confirm-attendees');
+    const refreshments = document.getElementById('confirm-refreshments');
+    const remarks = document.getElementById('confirm-remarks');
+    const cancelBtn = document.getElementById('confirm-booking-cancel');
+    const proceedBtn = document.getElementById('confirm-booking-proceed');
+
+    if (!modal || !cancelBtn || !proceedBtn) {
+        return Promise.resolve(true);
+    }
+
+    roomName.textContent = room?.room_name || `Room #${bookingData.roomId}`;
+    roomType.textContent = room?.type ? room.type.toUpperCase() : 'N/A';
+    bookingSlot.textContent = `${formatDateTimeForDisplay(bookingData.startTime)} to ${formatDateTimeForDisplay(bookingData.endTime)}`;
+    purpose.textContent = bookingData.purpose || '-';
+    attendees.textContent = bookingData.expectedPeople || '-';
+    remarks.textContent = bookingData.remarks || 'No additional remarks';
+
+    if (bookingData.snacksRequested && bookingData.refreshmentDetails) {
+        const refreshTime = bookingData.refreshmentDetails.time ? ` at ${bookingData.refreshmentDetails.time}` : '';
+        refreshments.textContent = `Requested${refreshTime}`;
+    } else {
+        refreshments.textContent = 'Not requested';
+    }
+
+    modal.classList.remove('hidden');
+
+    return new Promise(resolve => {
+        const closeModal = (result) => {
+            modal.classList.add('hidden');
+            cancelBtn.removeEventListener('click', onCancel);
+            proceedBtn.removeEventListener('click', onProceed);
+            modal.removeEventListener('click', onBackdropClick);
+            resolve(result);
+        };
+
+        const onCancel = () => closeModal(false);
+        const onProceed = () => closeModal(true);
+        const onBackdropClick = (event) => {
+            if (event.target === modal) {
+                closeModal(false);
+            }
+        };
+
+        cancelBtn.addEventListener('click', onCancel);
+        proceedBtn.addEventListener('click', onProceed);
+        modal.addEventListener('click', onBackdropClick);
+    });
+}
+
 export function renderRoomsForBooking() {
     const container = document.getElementById('room-container');
     const section = document.getElementById('available-rooms-section');
@@ -87,29 +211,24 @@ export async function initBookRoomForm() {
 }
 
 window.proceedWithBooking = async (roomId) => {
-    const guests = Array.from(document.querySelectorAll('input[name="participants[]"]:checked')).map(cb => parseInt(cb.value));
+    const bookingData = buildBookingData(roomId);
 
-    const bookingData = {
-        roomId: roomId,
-        purpose: document.getElementById('book-purpose').value,
-        expectedPeople: parseInt(document.getElementById('book-expected-number').value),
-        startTime: document.getElementById('book-start-time').value,
-        endTime: document.getElementById('book-end-time').value,
-        remarks: document.getElementById('book-remarks').value,
-        guests: guests,
-        snacksRequested: document.getElementById('book-snacks-requested').checked,
-        refreshmentDetails: document.getElementById('book-snacks-requested').checked ? {
-            tea: document.getElementById('refresh-tea').checked,
-            coffee: document.getElementById('refresh-coffee').checked,
-            snacks: document.getElementById('refresh-snacks').checked,
-            lunch: document.getElementById('refresh-lunch').checked,
-            onTable: document.getElementById('refresh-ontable').checked,
-            quantity: document.getElementById('refresh-quantity').value,
-            time: document.getElementById('refresh-time').value,
-            budget: document.getElementById('refresh-budget').value,
-            remarks: document.getElementById('refresh-remarks').value
-        } : null
-    };
+    if (bookingData.snacksRequested && bookingData.refreshmentDetails?.time) {
+        const isWithinWindow = isPreferredTimeWithinBookingWindow(
+            bookingData.startTime,
+            bookingData.endTime,
+            bookingData.refreshmentDetails.time
+        );
+
+        if (!isWithinWindow) {
+            showToast("Preferred refreshment time must be between booking start and end time.", "error");
+            return;
+        }
+    }
+
+    const selectedRoom = state.rooms.find(r => r.id === roomId);
+    const shouldProceed = await showBookingConfirmationModal(selectedRoom, bookingData);
+    if (!shouldProceed) return;
 
     try {
         await API.createBooking(bookingData);
