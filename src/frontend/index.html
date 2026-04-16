@@ -441,6 +441,45 @@
         </main>
     </div>
 
+    <!-- Admin Approve Confirmation Modal -->
+    <div id="admin-approve-modal" class="hidden admin-approve-modal">
+        <div class="admin-approve-card glass-card">
+            <div class="admin-approve-header">
+                <div class="admin-approve-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div>
+                    <h2>Approve Booking Request</h2>
+                    <p class="text-secondary">Please verify the booking details before approval.</p>
+                </div>
+            </div>
+
+            <div class="admin-approve-grid">
+                <div class="admin-approve-item">
+                    <span class="admin-approve-label">Requested By</span>
+                    <strong id="admin-approve-user">-</strong>
+                </div>
+                <div class="admin-approve-item">
+                    <span class="admin-approve-label">Room</span>
+                    <strong id="admin-approve-room">-</strong>
+                </div>
+                <div class="admin-approve-item admin-approve-item-wide">
+                    <span class="admin-approve-label">Time Slot</span>
+                    <strong id="admin-approve-slot">-</strong>
+                </div>
+                <div class="admin-approve-item admin-approve-item-wide">
+                    <span class="admin-approve-label">Purpose</span>
+                    <strong id="admin-approve-purpose">-</strong>
+                </div>
+            </div>
+
+            <div class="admin-approve-actions">
+                <button type="button" id="admin-approve-cancel" class="btn admin-approve-cancel">Cancel</button>
+                <button type="button" id="admin-approve-confirm" class="btn btn-primary">Approve Booking</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Booking Confirmation Modal -->
     <div id="booking-confirm-modal" class="hidden booking-confirm-modal">
         <div class="booking-confirm-card glass-card">

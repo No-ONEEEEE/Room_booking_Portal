@@ -7,6 +7,64 @@ import API from '../api.js';
 import state from './state.js';
 import { refreshAppData } from '../app.js';
 
+function formatDateTimeForDisplay(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value || '-';
+
+    return date.toLocaleString([], {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function showApproveConfirmationModal(booking) {
+    const modal = document.getElementById('admin-approve-modal');
+    const userName = document.getElementById('admin-approve-user');
+    const roomName = document.getElementById('admin-approve-room');
+    const slot = document.getElementById('admin-approve-slot');
+    const purpose = document.getElementById('admin-approve-purpose');
+    const cancelBtn = document.getElementById('admin-approve-cancel');
+    const confirmBtn = document.getElementById('admin-approve-confirm');
+
+    if (!modal || !cancelBtn || !confirmBtn) {
+        return Promise.resolve(true);
+    }
+
+    if (userName) userName.textContent = booking?.user_name || '-';
+    if (roomName) roomName.textContent = booking?.room_name || '-';
+    if (purpose) purpose.textContent = booking?.purpose || '-';
+    if (slot) {
+        slot.textContent = `${formatDateTimeForDisplay(booking?.start_time)} to ${formatDateTimeForDisplay(booking?.end_time)}`;
+    }
+
+    modal.classList.remove('hidden');
+
+    return new Promise(resolve => {
+        const closeModal = (result) => {
+            modal.classList.add('hidden');
+            cancelBtn.removeEventListener('click', onCancel);
+            confirmBtn.removeEventListener('click', onConfirm);
+            modal.removeEventListener('click', onBackdropClick);
+            resolve(result);
+        };
+
+        const onCancel = () => closeModal(false);
+        const onConfirm = () => closeModal(true);
+        const onBackdropClick = (event) => {
+            if (event.target === modal) {
+                closeModal(false);
+            }
+        };
+
+        cancelBtn.addEventListener('click', onCancel);
+        confirmBtn.addEventListener('click', onConfirm);
+        modal.addEventListener('click', onBackdropClick);
+    });
+}
+
 export async function refreshAdminData() {
     try {
         const { bookings: pending } = await API.getPendingRequests();
@@ -97,7 +155,10 @@ function renderAdminPending() {
 }
 
 window.approveBooking = async (id) => {
-    if (!confirm("Are you sure you want to approve this booking?")) return;
+    const booking = state.pendingBookings.find(b => Number(b.id) === Number(id));
+    const shouldProceed = await showApproveConfirmationModal(booking);
+    if (!shouldProceed) return;
+
     try {
         await API.approveBooking(id);
         refreshAppData();
