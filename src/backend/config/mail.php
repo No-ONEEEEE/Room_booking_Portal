@@ -10,4 +10,5 @@ return [
     'smtp_password' => 'ugjd ibjo qzlq zdgd',  
     'from_email'    => 'mahanth.second@gmail.com',   
     'from_name'     => 'Room Booking System',
+    'cds_email'     => 'cdsiiitacin@gmail.com',
 ];

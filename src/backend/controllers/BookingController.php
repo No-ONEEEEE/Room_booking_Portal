@@ -139,6 +139,8 @@ class BookingController
             $admins = $this->userModel->getAdmins();
             $roomName = $room['room_name'] ?? 'Room ' . $roomId;
 
+            // Get full booking details
+            $bookingDetails = $this->bookingModel->findById($bookingId);
             foreach ($admins as $admin) {
                 $this->notificationModel->create(
                     $admin['id'],
@@ -146,6 +148,28 @@ class BookingController
                     "New booking request received for $roomName.",
                     'info'
                 );
+                
+                // Send email to admin about new booking request
+                if (isset($admin['email']) && isset($admin['name'])) {
+                    sendBookingRequestEmailToAdmin(
+                        $admin['email'],
+                        $admin['name'],
+                        $bookingDetails,
+                        ['name' => $bookingDetails['user_name'], 'email' => $bookingDetails['user_email']]
+                    );
+                }
+            }
+            
+            // Send email to CDS if refreshments are requested
+            if ($snacksRequested && $bookingDetails) {
+                $config = require __DIR__ . '/../config/mail.php';
+                if (isset($config['cds_email']) && !empty($config['cds_email'])) {
+                    sendRefreshmentRequestEmailToCDS(
+                        $config['cds_email'],
+                        $bookingDetails,
+                        ['name' => $bookingDetails['user_name'], 'email' => $bookingDetails['user_email']]
+                    );
+                }
             }
         }
 

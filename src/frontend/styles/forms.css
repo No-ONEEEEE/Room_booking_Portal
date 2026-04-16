@@ -104,3 +104,112 @@ input:focus {
     border-color: var(--accent-blue);
     background: rgba(255, 255, 255, 0.08);
 }
+
+.booking-confirm-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 8, 25, 0.76);
+    z-index: 2200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    backdrop-filter: blur(10px);
+}
+
+.booking-confirm-card {
+    width: 100%;
+    max-width: 660px;
+    border: 1px solid rgba(56, 189, 248, 0.32);
+    box-shadow: 0 20px 45px rgba(8, 47, 73, 0.45);
+}
+
+.booking-confirm-header {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+}
+
+.booking-confirm-header h2 {
+    margin-bottom: 0.25rem;
+}
+
+.booking-confirm-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(99, 102, 241, 0.22));
+    color: #7dd3fc;
+    font-size: 1.1rem;
+}
+
+.booking-confirm-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.booking-confirm-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    border-radius: 10px;
+    padding: 0.8rem 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.booking-confirm-item strong {
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.booking-confirm-item-wide {
+    grid-column: 1 / -1;
+}
+
+.booking-confirm-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+}
+
+.booking-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.booking-confirm-cancel {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+}
+
+.booking-confirm-cancel:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+@media (max-width: 640px) {
+    .booking-confirm-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-confirm-item-wide {
+        grid-column: auto;
+    }
+
+    .booking-confirm-actions {
+        flex-direction: column-reverse;
+    }
+
+    .booking-confirm-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
