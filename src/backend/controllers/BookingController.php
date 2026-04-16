@@ -488,13 +488,52 @@ class BookingController
                 $this->notificationModel->create(
                     $booking['user_id'],
                     $bookingId,
-                    "Additional details have been requested for your booking.",
+                    "Admin requested details for booking #{$bookingId}: \"{$notes}\"",
                     'info'
                 );
             }
         }
 
         return success("Clarification requested from user");
+    }
+
+    public function provideClarification($bookingId, $response)
+    {
+        if (!$response) {
+            return error(
+                "Clarification response required",
+                400,
+                ["response" => "Clarification response is required"]
+            );
+        }
+
+        $updated = $this->bookingModel->provideClarification($bookingId, $response);
+
+        if ($updated === null) {
+            return error("Booking not found", 404);
+        }
+
+        if ($updated === false) {
+            return error("Unable to provide clarification", 409);
+        }
+
+        if ($updated) {
+            $booking = $this->bookingModel->findById($bookingId);
+            if ($booking) {
+                // Notify all admins
+                $admins = $this->userModel->getAdmins();
+                foreach ($admins as $admin) {
+                    $this->notificationModel->create(
+                        $admin['id'],
+                        $bookingId,
+                        "User {$booking['user_name']} provided details: \"{$response}\" (Booking #{$bookingId}).",
+                        'info'
+                    );
+                }
+            }
+        }
+
+        return success("Clarification provided to admin");
     }
 
     public function filter($startDate = null, $endDate = null, $status = null, $roomId = null, $userId = null)

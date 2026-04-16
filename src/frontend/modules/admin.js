@@ -142,7 +142,9 @@ function renderAdminPending() {
                     ${new Date(b.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
             </td>
-            <td>${b.purpose}</td>
+            <td>${b.purpose}
+                ${b.clarification_response ? `<div style="font-size: 0.75rem; color: var(--status-approved); margin-top: 0.5rem;"><i class="fas fa-reply"></i> Response: ${b.clarification_response}</div>` : ''}
+            </td>
             <td>
                 <div style="display: flex; gap: 0.5rem;">
                     <button class="btn btn-primary btn-small" onclick="approveBooking(${b.id})">Approve</button>

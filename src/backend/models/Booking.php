@@ -27,6 +27,7 @@ class Booking {
                 b.status,
                 b.decline_reason,
                 b.clarification_notes,
+                b.clarification_response,
                 b.created_at,
 
                 u.name AS user_name,
@@ -321,6 +322,32 @@ class Booking {
         ");
 
         $updateStmt->execute([$notes, $bookingId]);
+
+        return true;
+    }
+
+    public function provideClarification($bookingId, $response) {
+        $stmt = $this->pdo->prepare("
+            SELECT id, status
+            FROM bookings
+            WHERE id = ?
+            AND status = 'pending'
+        ");
+
+        $stmt->execute([$bookingId]);
+        $booking = $stmt->fetch();
+
+        if (!$booking) {
+            return null;
+        }
+
+        $updateStmt = $this->pdo->prepare("
+            UPDATE bookings
+            SET clarification_response = ?
+            WHERE id = ?
+        ");
+
+        $updateStmt->execute([$response, $bookingId]);
 
         return true;
     }

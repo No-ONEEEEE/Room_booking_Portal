@@ -69,14 +69,47 @@ export function renderNotifications() {
                 }
 
                 // Navigate if applicable
-                if (state.user && state.user.role === 'admin' && notification.message.includes('New booking request')) {
+                if (state.user && state.user.role === 'admin' && 
+                   (notification.message.includes('New booking request') || notification.message.includes('has provided the requested details'))) {
                     const { switchView } = await import('./navigation.js');
                     switchView('admin');
+                }
+
+                if (notification.message.includes('Additional details have been requested') || notification.message.includes('Admin requested details')) {
+                    const bookingIdMatch = notification.message.match(/#(\d+)/);
+                    if (bookingIdMatch) {
+                        openUserResponseModal(bookingIdMatch[1], notification.message);
+                    } else if (notification.booking_id) {
+                        openUserResponseModal(notification.booking_id, notification.message);
+                    }
                 }
             }
         });
     });
 }
+
+window.openUserResponseModal = (bookingId, adminRemarks) => {
+    const modal = document.getElementById('user-response-modal');
+    if (!modal) return;
+    
+    document.getElementById('user-response-booking-id').value = bookingId;
+    
+    const desc = document.getElementById('user-response-desc');
+    if (desc && adminRemarks) {
+        desc.textContent = adminRemarks;
+    }
+    
+    modal.classList.remove('hidden');
+};
+
+window.closeUserResponseModal = () => {
+    const modal = document.getElementById('user-response-modal');
+    if (modal) modal.classList.add('hidden');
+    const form = document.getElementById('user-response-form');
+    if (form) form.reset();
+    const desc = document.getElementById('user-response-desc');
+    if (desc) desc.textContent = 'The admin has requested more information regarding your booking.';
+};
 
 function getIconForType(type) {
     switch (type) {
@@ -135,6 +168,23 @@ export function initNotifications() {
 
     // Initial fetch
     fetchNotifications();
+
+    // Init form
+    const responseForm = document.getElementById('user-response-form');
+    if (responseForm) {
+        responseForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const bookingId = document.getElementById('user-response-booking-id').value;
+            const response = document.getElementById('user-response-input').value;
+            try {
+                await API.provideClarification(bookingId, response);
+                window.closeUserResponseModal();
+                fetchNotifications();
+            } catch (error) {
+                console.error('Failed to provide clarification:', error);
+            }
+        });
+    }
 
     // Poll for new notifications every minute
     setInterval(fetchNotifications, 60000);

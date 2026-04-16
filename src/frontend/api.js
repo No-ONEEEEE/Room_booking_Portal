@@ -100,6 +100,7 @@ const API = {
     approveBooking: (bookingId) => apiRequest(`/bookings/${bookingId}/approve`, 'PATCH'),
     declineBooking: (bookingId, reason) => apiRequest(`/bookings/${bookingId}/decline`, 'PATCH', { reason }),
     requestMoreDetails: (bookingId, notes) => apiRequest(`/bookings/${bookingId}/request-details`, 'PATCH', { notes }),
+    provideClarification: (bookingId, response) => apiRequest(`/bookings/${bookingId}/provide-details`, 'POST', { response }),
 
     // Feedback
     submitFeedback: (bookingId, rating, comments) => apiRequest('/feedback', 'POST', { bookingId, rating, comments }),

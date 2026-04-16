@@ -126,6 +126,16 @@ function bookingRoutes($method, $path, $input, $query, $pdo) {
         );
     }
 
+    if ($method === "POST" && preg_match('#^/bookings/(\d+)/provide-details$#', $path, $matches)) {
+        $authError = requireAuth();
+        if ($authError) return $authError;
+
+        return $booking->provideClarification(
+            (int)$matches[1],
+            $input['response'] ?? null
+        );
+    }
+
     if ($method === "GET" && preg_match("#^/bookings/(\d+)$#", $path, $matches)) {
 
         $authError = requireAuth();

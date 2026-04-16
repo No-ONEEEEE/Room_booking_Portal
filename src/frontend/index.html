@@ -592,6 +592,30 @@
             </form>
         </div>
     </div>
+    
+    <!-- User Response Modal -->
+    <div id="user-response-modal" class="hidden"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="width: 100%; max-width: 450px;">
+            <h2 id="user-response-title">Provide Clarification</h2>
+            <p id="user-response-desc" class="text-secondary" style="margin-bottom: 1.5rem;">The admin has requested more information regarding your booking.</p>
+
+            <form id="user-response-form">
+                <input type="hidden" id="user-response-booking-id">
+
+                <div class="input-group">
+                    <label id="user-response-label">Your Response</label>
+                    <textarea id="user-response-input" rows="4" placeholder="Type here..." required></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Response</button>
+                    <button type="button" class="btn" style="background: rgba(255,255,255,0.1);"
+                        onclick="closeUserResponseModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Feedback Modal -->
     <div id="feedback-modal" class="hidden"
