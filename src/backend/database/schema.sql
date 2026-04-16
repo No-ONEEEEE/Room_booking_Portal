@@ -50,6 +50,7 @@ CREATE TABLE bookings (
 
     decline_reason TEXT,
     clarification_notes TEXT,
+    clarification_response TEXT,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
