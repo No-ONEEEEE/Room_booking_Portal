@@ -77,6 +77,8 @@ export function initCalendar() {
     state.calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         themeSystem: 'standard',
+        showNonCurrentDates: false,
+        fixedWeekCount: false,
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',

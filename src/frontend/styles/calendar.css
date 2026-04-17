@@ -16,6 +16,17 @@
     background: rgba(56, 189, 248, 0.05) !important;
 }
 
+/* Keep out-of-month placeholders visually consistent while staying empty. */
+.fc .fc-day-disabled {
+    background: transparent !important;
+}
+
+.fc .fc-day-disabled .fc-daygrid-day-number,
+.fc .fc-day-disabled .fc-daygrid-event-harness,
+.fc .fc-day-disabled .fc-daygrid-more-link {
+    display: none !important;
+}
+
 /* Event Styling & Text Wrapping */
 .fc-event {
     cursor: pointer;
