@@ -348,7 +348,7 @@
                     <p class="text-secondary">Search for a room to view its availability calendar.</p>
                 </div>
 
-                <div class="glass-card" style="margin-bottom: 2rem;">
+                <div id="search-filters-card" class="glass-card" style="margin-bottom: 2rem;">
                     <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; align-items: flex-end;">
                         <div class="input-group" style="margin-bottom: 0;">
                             <label>Room Name</label>
@@ -378,20 +378,25 @@
 
                 <div id="room-schedule-container" class="hidden">
                     <div class="glass-card">
+                        <div class="room-schedule-toolbar">
+                            <button class="btn room-schedule-back-btn" type="button" onclick="goBackFromRoomSchedule()">
+                                <i class="fas fa-arrow-left"></i> Go Back
+                            </button>
+                        </div>
                         <div id="room-calendar"></div>
                         <div class="calendar-legend"
                             style="margin-top: 1.5rem; display: flex; gap: 1.5rem; font-size: 0.85rem; padding-top: 1rem; border-top: 1px solid var(--border-glass);">
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div
+                                <!-- <div
                                     style="width: 12px; height: 12px; border-radius: 2px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444;">
                                 </div>
-                                <span>Occupied / Booked</span>
+                                <span>Occupied / Booked</span> -->
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div
+                                <!-- <div
                                     style="width: 12px; height: 12px; border-radius: 2px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981;">
                                 </div>
-                                <span>Available</span>
+                                <span>Available</span> -->
                             </div>
                         </div>
                     </div>

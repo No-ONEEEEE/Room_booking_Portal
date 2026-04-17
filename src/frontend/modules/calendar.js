@@ -79,6 +79,9 @@ export function initCalendar() {
         themeSystem: 'standard',
         showNonCurrentDates: false,
         fixedWeekCount: false,
+        buttonText: {
+            today: 'Today'
+        },
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',

@@ -248,11 +248,18 @@ function renderSearchResults(rooms) {
 }
 
 window.selectRoomForSchedule = async (roomId, roomName) => {
+    document.getElementById('search-filters-card')?.classList.add('hidden');
     document.getElementById('search-results-list').classList.add('hidden');
     document.getElementById('search-results-pagination')?.classList.add('hidden');
-    document.getElementById('search-room-name').value = roomName;
     document.getElementById('room-schedule-container').classList.remove('hidden');
     await loadRoomSchedule(roomId);
+};
+
+window.goBackFromRoomSchedule = () => {
+    document.getElementById('search-filters-card')?.classList.remove('hidden');
+    document.getElementById('room-schedule-container').classList.add('hidden');
+    document.getElementById('search-results-list')?.classList.remove('hidden');
+    document.getElementById('search-results-pagination')?.classList.remove('hidden');
 };
 
 async function loadRoomSchedule(roomId) {
@@ -272,44 +279,23 @@ function renderRoomCalendar(bookings) {
         roomCalendar.destroy();
     }
 
-    // Process bookings to identify occupied days
-    const occupiedDates = new Set();
-    bookings.forEach(b => {
-        if (b.status === 'approved' || b.status === 'pending') {
-            const start = new Date(b.start_time);
-            const end = new Date(b.end_time);
-
-            // Add all dates between start and end
-            let current = new Date(start.toDateString());
-            const last = new Date(end.toDateString());
-
-            while (current <= last) {
-                occupiedDates.add(current.toISOString().split('T')[0]);
-                current.setDate(current.getDate() + 1);
-            }
-        }
-    });
-
     roomCalendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
+        initialView: 'timeGridWeek',
+        buttonText: {
+            today: 'Today'
+        },
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: ''
         },
+        allDaySlot: false,
+        nowIndicator: true,
+        slotMinTime: '00:00:00',
+        slotMaxTime: '24:00:00',
+        slotLabelInterval: '01:00:00',
+        scrollTime: '00:00:00',
         height: 'auto',
-        dayCellDidMount: (info) => {
-            const dateStr = info.date.toISOString().split('T')[0];
-            if (occupiedDates.has(dateStr)) {
-                info.el.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
-                info.el.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-                info.el.setAttribute('title', 'Occupied');
-            } else {
-                info.el.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
-                info.el.style.border = '1px solid rgba(16, 185, 129, 0.2)';
-                info.el.setAttribute('title', 'Available');
-            }
-        },
         events: bookings.filter(b => b.status === 'approved' || b.status === 'pending').map(b => ({
             title: b.purpose,
             start: b.start_time,
@@ -333,6 +319,20 @@ export function refreshSearchRooms() {
         roomCalendar.updateSize();
     }
 
+    if (typeof performSearchHandler === 'function') {
+        performSearchHandler();
+    }
+}
+
+export function resetSearchRoomsView() {
+    document.getElementById('search-room-name').value = '';
+    document.getElementById('search-room-type').value = '';
+    document.getElementById('search-room-capacity').value = '';
+
+    document.getElementById('search-filters-card')?.classList.remove('hidden');
+    document.getElementById('room-schedule-container')?.classList.add('hidden');
+
+    searchCurrentPage = 1;
     if (typeof performSearchHandler === 'function') {
         performSearchHandler();
     }

@@ -16,6 +16,17 @@ export function setScheduleScope(scope) {
     myBookingsCurrentPage = 1;
 }
 
+export function resetScheduleView(scope = 'own') {
+    setScheduleScope(scope);
+    state.bookingFilter = 'all';
+    myBookingsCurrentPage = 1;
+
+    const tabs = document.querySelectorAll('.status-tab');
+    tabs.forEach(tab => {
+        tab.classList.toggle('active', tab.getAttribute('data-status') === 'all');
+    });
+}
+
 function renderBookingsPagination(currentPage, totalPages) {
     const paginationEl = document.getElementById('my-bookings-pagination');
     if (!paginationEl) return;
