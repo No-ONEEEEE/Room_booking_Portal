@@ -7,6 +7,8 @@ import state from './state.js';
 import { refreshAdminData } from './admin.js';
 import { refreshSearchRooms } from './search-rooms.js';
 import { refreshAppData } from '../app.js';
+import { setScheduleScope } from './bookings.js';
+import { refreshCalendarEvents } from './calendar.js';
 
 export function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item[data-view]');
@@ -23,12 +25,21 @@ export function initNavigation() {
 }
 
 export function switchView(viewId) {
+    const actualViewId = viewId === 'view-bookings' ? 'my-bookings' : viewId;
+
     document.querySelectorAll('.page-view').forEach(view => view.classList.add('hidden'));
-    document.getElementById(`view-${viewId}`).classList.remove('hidden');
+    document.getElementById(`view-${actualViewId}`).classList.remove('hidden');
     state.currentView = viewId;
 
-    if (viewId === 'my-bookings') {
+    if (actualViewId === 'my-bookings') {
+        if (state.user?.role === 'admin') {
+            setScheduleScope(viewId === 'view-bookings' ? 'all' : 'own');
+        } else {
+            setScheduleScope('own');
+        }
+
         refreshAppData().then(() => {
+            refreshCalendarEvents();
             // Refresh calendar if it's visible
             const calView = document.getElementById('schedule-calendar-view');
             if (calView && !calView.classList.contains('hidden') && state.calendar) {
@@ -69,6 +80,7 @@ window.switchScheduleView = (view) => {
         btnCal.classList.add('active');
         // Re-render calendar when switching to it
         if (state.calendar) {
+            refreshCalendarEvents();
             state.calendar.updateSize();
             state.calendar.render();
         }

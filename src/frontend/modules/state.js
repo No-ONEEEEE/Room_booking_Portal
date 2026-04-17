@@ -10,6 +10,7 @@ let state = {
     pendingBookings: [],
     notifications: [],
     bookingFilter: 'all',
+    scheduleScope: 'own',
     calendar: null,
     charts: {}
 };

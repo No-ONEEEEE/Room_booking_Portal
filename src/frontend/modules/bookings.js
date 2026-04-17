@@ -11,6 +11,11 @@ import { refreshAppData } from '../app.js';
 const MY_BOOKINGS_PAGE_SIZE = 20;
 let myBookingsCurrentPage = 1;
 
+export function setScheduleScope(scope) {
+    state.scheduleScope = scope === 'all' ? 'all' : 'own';
+    myBookingsCurrentPage = 1;
+}
+
 function renderBookingsPagination(currentPage, totalPages) {
     const paginationEl = document.getElementById('my-bookings-pagination');
     if (!paginationEl) return;
@@ -67,8 +72,13 @@ export function renderBookingsList() {
     if (!container) return;
 
     let filtered = state.bookings;
+
+    if (state.user?.role === 'admin' && state.scheduleScope === 'own') {
+        filtered = filtered.filter(b => Number(b.user_id) === Number(state.user.id));
+    }
+
     if (state.bookingFilter !== 'all') {
-        filtered = state.bookings.filter(b => b.status === state.bookingFilter);
+        filtered = filtered.filter(b => b.status === state.bookingFilter);
     }
 
     if (!filtered.length) {
