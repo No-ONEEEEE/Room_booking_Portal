@@ -1,0 +1,170 @@
+/* ROOK - Landing Page & CAS Login Styles */
+
+#view-login {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at top right, #1e293b, #0f172a);
+    z-index: 100;
+}
+
+/* Background elements for that "premium" feel */
+#view-login::before {
+    content: '';
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: var(--accent-indigo);
+    filter: blur(150px);
+    opacity: 0.2;
+    top: -100px;
+    right: -100px;
+    z-index: -1;
+}
+
+#view-login::after {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: var(--accent-blue);
+    filter: blur(200px);
+    opacity: 0.15;
+    bottom: -150px;
+    left: -150px;
+    z-index: -1;
+}
+
+.landing-card {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    padding: 4.5rem 3.5rem;
+    width: 100%;
+    max-width: 540px;
+    text-align: center;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    animation: landingFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes landingFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.landing-logo {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.04em;
+}
+
+.landing-logo i {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-indigo));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.5));
+}
+
+.landing-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(to bottom, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+}
+
+.landing-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.15rem;
+    margin-bottom: 3.5rem;
+    line-height: 1.6;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-cas {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: #fff;
+    color: #0f172a;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 1.25rem 2.5rem;
+    border-radius: 16px;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-cas:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(255, 255, 255, 0.15);
+    background: #fff;
+}
+
+.btn-cas:active {
+    transform: translateY(-1px) scale(1);
+}
+
+.btn-cas i {
+    font-size: 1.2rem;
+    color: var(--accent-indigo);
+}
+
+.landing-footer {
+    margin-top: 2.5rem;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.landing-footer p {
+    opacity: 0.7;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .landing-card {
+        padding: 3rem 2rem;
+        margin: 1rem;
+    }
+
+    .landing-logo {
+        font-size: 2.75rem;
+    }
+
+    .landing-title {
+        font-size: 2rem;
+    }
+}
