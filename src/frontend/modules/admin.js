@@ -65,6 +65,23 @@ function showApproveConfirmationModal(booking) {
     });
 }
 
+function setRefreshButtonLoading(button, isLoading) {
+    if (!button) return;
+
+    button.classList.remove('refresh-pop');
+    // Force reflow so repeated clicks replay the pop animation.
+    void button.offsetWidth;
+    button.classList.add('refresh-pop');
+
+    if (isLoading) {
+        button.disabled = true;
+        button.classList.add('refresh-loading');
+    } else {
+        button.disabled = false;
+        button.classList.remove('refresh-loading');
+    }
+}
+
 export async function refreshAdminData() {
     try {
         const { bookings: pending } = await API.getPendingRequests();
@@ -199,6 +216,24 @@ window.closeAdminModal = () => {
 
 window.refreshAdminData = refreshAdminData;
 window.refreshFeedbackData = refreshFeedbackData;
+
+window.handleAdminRefresh = async (button) => {
+    setRefreshButtonLoading(button, true);
+    try {
+        await refreshAdminData();
+    } finally {
+        setRefreshButtonLoading(button, false);
+    }
+};
+
+window.handleFeedbackRefresh = async (button) => {
+    setRefreshButtonLoading(button, true);
+    try {
+        await refreshFeedbackData();
+    } finally {
+        setRefreshButtonLoading(button, false);
+    }
+};
 
 export function initAdminForm() {
     const form = document.getElementById('admin-action-form');

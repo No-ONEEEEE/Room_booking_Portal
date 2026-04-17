@@ -12,6 +12,7 @@ const MONTH_NAMES = [
 
 let statsFiltersInitialized = false;
 let statsRefreshIntervalId = null;
+let activityClickBound = false;
 
 const STATUS_LABELS = ['pending', 'approved', 'completed', 'declined', 'cancelled'];
 const STATUS_COLORS = {
@@ -147,13 +148,114 @@ function getBookingsBySelectedFilters() {
     });
 }
 
+function parseRefreshmentDetails(details) {
+    if (!details) return null;
+    if (typeof details === 'object') return details;
+
+    try {
+        return JSON.parse(details);
+    } catch (_) {
+        return null;
+    }
+}
+
+function bindActivityClickHandler() {
+    if (activityClickBound) return;
+
+    const container = document.getElementById('activity-feed');
+    if (!container) return;
+
+    container.addEventListener('click', (event) => {
+        const row = event.target.closest('[data-activity-booking-id]');
+        if (!row) return;
+
+        const bookingId = Number(row.getAttribute('data-activity-booking-id'));
+        if (Number.isNaN(bookingId)) return;
+
+        openActivityDetailsModal(bookingId);
+    });
+
+    activityClickBound = true;
+}
+
+function openActivityDetailsModal(bookingId) {
+    const modal = document.getElementById('activity-details-modal');
+    const booking = state.bookings.find(b => Number(b.id) === bookingId);
+
+    if (!modal || !booking) return;
+
+    const statusEl = document.getElementById('activity-detail-status');
+    const purposeEl = document.getElementById('activity-detail-purpose');
+    const userEl = document.getElementById('activity-detail-user');
+    const roomEl = document.getElementById('activity-detail-room');
+    const slotEl = document.getElementById('activity-detail-slot');
+    const attendeesEl = document.getElementById('activity-detail-attendees');
+    const refreshmentsEl = document.getElementById('activity-detail-refreshments');
+
+    const bookingStart = parseBookingDate(booking.start_time);
+    const bookingEnd = parseBookingDate(booking.end_time);
+    const refreshmentDetails = parseRefreshmentDetails(booking.refreshment_details);
+
+    if (statusEl) {
+        statusEl.className = `status-badge status-${booking.status}`;
+        statusEl.textContent = booking.status || '-';
+    }
+
+    if (purposeEl) purposeEl.textContent = booking.purpose || '-';
+    if (userEl) userEl.textContent = booking.user_name || (state.user?.name || '-');
+    if (roomEl) roomEl.textContent = booking.room_name || '-';
+
+    if (slotEl) {
+        const startText = bookingStart ? bookingStart.toLocaleString() : (booking.start_time || '-');
+        const endText = bookingEnd ? bookingEnd.toLocaleString() : (booking.end_time || '-');
+        slotEl.textContent = `${startText} to ${endText}`;
+    }
+
+    if (attendeesEl) attendeesEl.textContent = booking.expected_people || '-';
+
+    if (refreshmentsEl) {
+        if (!booking.snacks_requested) {
+            refreshmentsEl.textContent = 'Not requested';
+        } else if (refreshmentDetails?.time) {
+            refreshmentsEl.textContent = `Requested at ${refreshmentDetails.time}`;
+        } else {
+            refreshmentsEl.textContent = 'Requested';
+        }
+    }
+
+    modal.classList.remove('hidden');
+}
+
+window.closeActivityDetailsModal = () => {
+    const modal = document.getElementById('activity-details-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+};
+
+function ensureActivityModalCloseBinding() {
+    const modal = document.getElementById('activity-details-modal');
+    if (!modal || modal.dataset.bound === 'true') return;
+
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            window.closeActivityDetailsModal();
+        }
+    });
+
+    modal.dataset.bound = 'true';
+}
+
 export function renderActivity() {
     const container = document.getElementById('activity-feed');
     if (!container) return;
 
+    bindActivityClickHandler();
+    ensureActivityModalCloseBinding();
+
     const recent = state.bookings.slice(-5).reverse();
     container.innerHTML = recent.length ? recent.map(b => `
-        <div class="request-item">
+        <div class="request-item activity-clickable" data-activity-booking-id="${b.id}" title="Click to view details">
             <div>
                 <p style="font-weight: 500;">${b.purpose || 'Room Reservation'}</p>
                 <p style="color: var(--text-dim); font-size: 0.75rem;">${new Date(b.start_time).toLocaleDateString()} - Room #${b.room_name || b.roomId}</p>
@@ -179,9 +281,17 @@ export function updateStats() {
         b => b.status === 'approved' || b.status === 'completed'
     );
 
-    const allActiveBookingsCount = state.bookings.filter(b => b.status === 'approved').length;
-
     const now = new Date();
+    const allActiveBookingsCount = state.bookings.filter(b => {
+        if (b.status !== 'approved') return false;
+
+        const bookingStart = parseBookingDate(b.start_time);
+        const bookingEnd = parseBookingDate(b.end_time);
+
+        if (!bookingStart || !bookingEnd) return false;
+        return bookingStart <= now && bookingEnd >= now;
+    }).length;
+
     const currentlyOccupiedRoomIds = new Set(
         state.bookings
             .filter(b => {
