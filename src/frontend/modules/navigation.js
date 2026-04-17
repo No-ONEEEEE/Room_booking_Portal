@@ -4,11 +4,36 @@
  */
 
 import state from './state.js';
-import { refreshAdminData } from './admin.js';
-import { refreshSearchRooms } from './search-rooms.js';
+import { refreshAdminData, resetAdminPanelView } from './admin.js';
+import { refreshSearchRooms, resetSearchRoomsView } from './search-rooms.js';
 import { refreshAppData } from '../app.js';
-import { setScheduleScope } from './bookings.js';
+import { setScheduleScope, resetScheduleView } from './bookings.js';
 import { refreshCalendarEvents } from './calendar.js';
+
+function resetCurrentView(viewId) {
+    if (viewId === 'search-rooms') {
+        resetSearchRoomsView();
+        return;
+    }
+
+    if (viewId === 'admin') {
+        resetAdminPanelView();
+        return;
+    }
+
+    if (viewId === 'my-bookings' || viewId === 'view-bookings') {
+        const scope = viewId === 'view-bookings' ? 'all' : 'own';
+        resetScheduleView(scope);
+        refreshAppData().then(() => {
+            refreshCalendarEvents();
+            const calView = document.getElementById('schedule-calendar-view');
+            if (calView && !calView.classList.contains('hidden') && state.calendar) {
+                state.calendar.updateSize();
+                state.calendar.render();
+            }
+        });
+    }
+}
 
 export function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item[data-view]');
@@ -16,6 +41,12 @@ export function initNavigation() {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const targetView = item.getAttribute('data-view');
+
+            if (targetView === state.currentView) {
+                resetCurrentView(targetView);
+                return;
+            }
+
             switchView(targetView);
 
             navItems.forEach(i => i.classList.remove('active'));

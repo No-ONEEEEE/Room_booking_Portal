@@ -261,6 +261,19 @@ export async function refreshAdminData() {
     }
 }
 
+export function resetAdminPanelView() {
+    pendingCurrentPage = 1;
+    feedbackCurrentPage = 1;
+    adminActiveSection = 'pending';
+
+    const roomFilter = document.getElementById('admin-feedback-room-filter');
+    if (roomFilter) {
+        roomFilter.value = '';
+    }
+
+    refreshAdminData();
+}
+
 export async function refreshFeedbackData() {
     const container = document.getElementById('admin-feedback-container');
     const paginationEl = document.getElementById('admin-feedback-pagination');
