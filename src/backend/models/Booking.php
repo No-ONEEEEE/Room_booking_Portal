@@ -413,6 +413,11 @@ class Booking {
             $params[] = $userId;
         }
 
+        // Fix: Ensure we don't show pending bookings from previous days in the Admin Panel/Default views
+        if ($status === 'pending' && $startDate === null && $endDate === null) {
+            $query .= " AND DATE(b.start_time) >= CURRENT_DATE()";
+        }
+
         $query .= " ORDER BY b.start_time ASC, b.id ASC";
 
         $stmt = $this->pdo->prepare($query);
