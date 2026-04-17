@@ -7,6 +7,12 @@ import API from '../api.js';
 import state from './state.js';
 import { refreshAppData } from '../app.js';
 
+const PENDING_PAGE_SIZE = 8;
+const FEEDBACK_PAGE_SIZE = 5;
+
+let pendingCurrentPage = 1;
+let feedbackCurrentPage = 1;
+
 function formatDateTimeForDisplay(value) {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value || '-';
@@ -87,6 +93,7 @@ function ensureFeedbackFilterBinding() {
     if (!roomFilter || roomFilter.dataset.bound === 'true') return;
 
     roomFilter.addEventListener('change', () => {
+        feedbackCurrentPage = 1;
         refreshFeedbackData();
     });
 
@@ -152,10 +159,47 @@ function renderFeedbackList(container, feedbackList) {
     }).join('');
 }
 
+function renderPaginationControls(container, currentPage, totalPages, onPageSelect) {
+    if (!container) return;
+
+    if (totalPages <= 1) {
+        container.classList.add('hidden');
+        container.innerHTML = '';
+        return;
+    }
+
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pages.push(`<button class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`);
+    }
+
+    container.innerHTML = `
+        <button class="pagination-btn" data-page="${Math.max(1, currentPage - 1)}" ${currentPage === 1 ? 'disabled' : ''}>Prev</button>
+        ${pages.join('')}
+        <button class="pagination-btn" data-page="${Math.min(totalPages, currentPage + 1)}" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+    `;
+
+    container.classList.remove('hidden');
+
+    container.querySelectorAll('[data-page]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const selectedPage = Number(btn.getAttribute('data-page'));
+            if (!Number.isNaN(selectedPage) && selectedPage !== currentPage) {
+                onPageSelect(selectedPage);
+            }
+        });
+    });
+}
+
 export async function refreshAdminData() {
     try {
         const { bookings: pending } = await API.getPendingRequests();
         state.pendingBookings = Array.isArray(pending) ? pending : [];
+
+        const pendingTotalPages = Math.max(Math.ceil(state.pendingBookings.length / PENDING_PAGE_SIZE), 1);
+        if (pendingCurrentPage > pendingTotalPages) {
+            pendingCurrentPage = pendingTotalPages;
+        }
 
         renderAdminPending();
 
@@ -171,6 +215,7 @@ export async function refreshAdminData() {
 
 export async function refreshFeedbackData() {
     const container = document.getElementById('admin-feedback-container');
+    const paginationEl = document.getElementById('admin-feedback-pagination');
     if (!container) return;
 
     ensureFeedbackFilterBinding();
@@ -188,22 +233,51 @@ export async function refreshFeedbackData() {
             ? feedbackList.filter(f => String(f.room_id) === selectedRoom)
             : feedbackList;
 
-        renderFeedbackList(container, filteredFeedback);
+        const totalPages = Math.max(Math.ceil(filteredFeedback.length / FEEDBACK_PAGE_SIZE), 1);
+        if (feedbackCurrentPage > totalPages) {
+            feedbackCurrentPage = totalPages;
+        }
+
+        const start = (feedbackCurrentPage - 1) * FEEDBACK_PAGE_SIZE;
+        const pagedFeedback = filteredFeedback.slice(start, start + FEEDBACK_PAGE_SIZE);
+
+        renderFeedbackList(container, pagedFeedback);
+        renderPaginationControls(paginationEl, feedbackCurrentPage, totalPages, (page) => {
+            feedbackCurrentPage = page;
+            refreshFeedbackData();
+        });
     } catch (e) {
         container.innerHTML = `<p class="text-dim" style="text-align: center; padding: 1rem;">Could not load feedback.</p>`;
+        if (paginationEl) {
+            paginationEl.classList.add('hidden');
+            paginationEl.innerHTML = '';
+        }
     }
 }
 
 function renderAdminPending() {
     const container = document.getElementById('admin-pending-table');
+    const paginationEl = document.getElementById('admin-pending-pagination');
     if (!container) return;
 
     if (!state.pendingBookings.length) {
         container.innerHTML = '<tr><td colspan="5" class="text-center text-dim">No pending requests found.</td></tr>';
+        if (paginationEl) {
+            paginationEl.classList.add('hidden');
+            paginationEl.innerHTML = '';
+        }
         return;
     }
 
-    container.innerHTML = state.pendingBookings.map(b => `
+    const totalPages = Math.max(Math.ceil(state.pendingBookings.length / PENDING_PAGE_SIZE), 1);
+    if (pendingCurrentPage > totalPages) {
+        pendingCurrentPage = totalPages;
+    }
+
+    const start = (pendingCurrentPage - 1) * PENDING_PAGE_SIZE;
+    const pagedPending = state.pendingBookings.slice(start, start + PENDING_PAGE_SIZE);
+
+    container.innerHTML = pagedPending.map(b => `
         <tr>
             <td>
                 <div style="font-weight: 500;">${b.user_name}</div>
@@ -229,6 +303,11 @@ function renderAdminPending() {
             </td>
         </tr>
     `).join('');
+
+    renderPaginationControls(paginationEl, pendingCurrentPage, totalPages, (page) => {
+        pendingCurrentPage = page;
+        renderAdminPending();
+    });
 }
 
 window.approveBooking = async (id) => {

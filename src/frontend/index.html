@@ -350,10 +350,10 @@
                         </div>
                     </div>
 
-                    <div id="search-results-list" class="hidden"
-                        style="margin-top: 1.5rem; max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 0.75rem; border: 1px solid var(--border-glass);">
+                    <div id="search-results-list" class="hidden" style="margin-top: 1.5rem;">
                         <!-- Result items injected here -->
                     </div>
+                    <div id="search-results-pagination" class="list-pagination hidden"></div>
                 </div>
 
                 <div id="room-schedule-container" class="hidden">
@@ -421,6 +421,7 @@
                             </tbody>
                         </table>
                     </div>
+                    <div id="admin-pending-pagination" class="list-pagination hidden"></div>
                 </div>
 
                 <!-- Admin Feedback Section -->
@@ -440,6 +441,7 @@
                     <div id="admin-feedback-container">
                         <p class="text-dim" style="text-align: center; padding: 1rem;">Loading feedback...</p>
                     </div>
+                    <div id="admin-feedback-pagination" class="list-pagination hidden"></div>
                 </div>
             </section>
 
