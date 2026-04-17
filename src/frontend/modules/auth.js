@@ -11,34 +11,20 @@ import { initCalendar } from './calendar.js';
 import { initBookRoomForm } from './rooms.js';
 
 export async function initAuth() {
-    const loginForm = document.getElementById('login-form');
     const loginView = document.getElementById('view-login');
 
-    // Check if user is already logged in
+    // Check if user is already logged in (session check)
     try {
         const { user } = await API.me();
-        if (user && user.id) { // Check for user.id to verify it's a valid user object
+        if (user && user.id) {
             handleLoginSuccess(user);
+        } else {
+            loginView.classList.remove('hidden');
         }
     } catch (e) {
         console.warn("User not logged in:", e.message);
         loginView.classList.remove('hidden');
     }
-
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-
-        try {
-            const { user } = await API.login(email);
-            if (user && user.id) {
-                handleLoginSuccess(user);
-            }
-        } catch (error) {
-            console.error("Login failed:", error);
-            // Error toast handled by API
-        }
-    });
 }
 
 export async function handleLoginSuccess(user) {
@@ -59,7 +45,7 @@ export async function handleLoginSuccess(user) {
         dDesc.style.display = 'none';
     } else {
         const firstName = user.name ? user.name.split(' ')[0] : 'User';
-        dTitle.textContent = `Welcome, ${firstName}`;
+        dTitle.textContent = `Welcome, ${firstName}!`;
         dDesc.textContent = "Review your upcoming schedules and reserve new high-tech spaces.";
         dDesc.style.display = '';
     }
