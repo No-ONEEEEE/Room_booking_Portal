@@ -82,6 +82,76 @@ function setRefreshButtonLoading(button, isLoading) {
     }
 }
 
+function ensureFeedbackFilterBinding() {
+    const roomFilter = document.getElementById('admin-feedback-room-filter');
+    if (!roomFilter || roomFilter.dataset.bound === 'true') return;
+
+    roomFilter.addEventListener('change', () => {
+        refreshFeedbackData();
+    });
+
+    roomFilter.dataset.bound = 'true';
+}
+
+function updateFeedbackRoomFilterOptions(feedbackList) {
+    const roomFilter = document.getElementById('admin-feedback-room-filter');
+    if (!roomFilter) return;
+
+    const previousValue = roomFilter.value || '';
+
+    const roomMap = new Map();
+    feedbackList.forEach(f => {
+        if (f.room_id === undefined || f.room_id === null) return;
+        const roomId = String(f.room_id);
+        const roomName = f.room_name || `Room #${roomId}`;
+        roomMap.set(roomId, roomName);
+    });
+
+    roomFilter.innerHTML = '<option value="">All Rooms</option>';
+
+    [...roomMap.entries()]
+        .sort((a, b) => a[1].localeCompare(b[1]))
+        .forEach(([roomId, roomName]) => {
+            const option = document.createElement('option');
+            option.value = roomId;
+            option.textContent = roomName;
+            roomFilter.appendChild(option);
+        });
+
+    if (previousValue && roomMap.has(previousValue)) {
+        roomFilter.value = previousValue;
+    } else {
+        roomFilter.value = '';
+    }
+}
+
+function renderFeedbackList(container, feedbackList) {
+    if (!feedbackList.length) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-comments"></i>
+                <p>No feedback submitted yet.</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = feedbackList.map(f => {
+        const stars = Array.from({length: 5}, (_, i) =>
+            `<i class="fas fa-star ${i < f.rating ? '' : 'empty'}"></i>`
+        ).join('');
+
+        return `
+            <div class="feedback-card">
+                <div class="feedback-header">
+                    <div class="feedback-stars">${stars}</div>
+                    <span class="feedback-meta">Booking #${f.booking_id} · ${f.room_name || `Room #${f.room_id}`}</span>
+                </div>
+                ${f.comments ? `<p class="feedback-comment">"${f.comments}"</p>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
 export async function refreshAdminData() {
     try {
         const { bookings: pending } = await API.getPendingRequests();
@@ -103,34 +173,22 @@ export async function refreshFeedbackData() {
     const container = document.getElementById('admin-feedback-container');
     if (!container) return;
 
+    ensureFeedbackFilterBinding();
+
     try {
         const { feedbacks } = await API.getAllFeedback();
         const feedbackList = Array.isArray(feedbacks) ? feedbacks : [];
 
-        if (!feedbackList.length) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-comments"></i>
-                    <p>No feedback submitted yet.</p>
-                </div>`;
-            return;
-        }
+        updateFeedbackRoomFilterOptions(feedbackList);
 
-        container.innerHTML = feedbackList.map(f => {
-            const stars = Array.from({length: 5}, (_, i) =>
-                `<i class="fas fa-star ${i < f.rating ? '' : 'empty'}"></i>`
-            ).join('');
+        const roomFilter = document.getElementById('admin-feedback-room-filter');
+        const selectedRoom = roomFilter ? roomFilter.value : '';
 
-            return `
-                <div class="feedback-card">
-                    <div class="feedback-header">
-                        <div class="feedback-stars">${stars}</div>
-                        <span class="feedback-meta">Booking #${f.booking_id} · Room #${f.room_id}</span>
-                    </div>
-                    ${f.comments ? `<p class="feedback-comment">"${f.comments}"</p>` : ''}
-                </div>
-            `;
-        }).join('');
+        const filteredFeedback = selectedRoom
+            ? feedbackList.filter(f => String(f.room_id) === selectedRoom)
+            : feedbackList;
+
+        renderFeedbackList(container, filteredFeedback);
     } catch (e) {
         container.innerHTML = `<p class="text-dim" style="text-align: center; padding: 1rem;">Could not load feedback.</p>`;
     }
@@ -166,7 +224,7 @@ function renderAdminPending() {
                 <div style="display: flex; gap: 0.5rem;">
                     <button class="btn btn-primary btn-small" onclick="approveBooking(${b.id})">Approve</button>
                     <button class="btn btn-small" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;" onclick="openAdminActionModal(${b.id}, 'decline')">Decline</button>
-                    <button class="btn btn-small" style="background: rgba(255, 255, 255, 0.05);" onclick="openAdminActionModal(${b.id}, 'details')">More Info</button>
+                    <button class="btn btn-small more-info-btn" onclick="openAdminActionModal(${b.id}, 'details')">More Info</button>
                 </div>
             </td>
         </tr>

@@ -428,9 +428,14 @@
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                         <h3>User Feedback</h3>
-                        <button class="btn refresh-btn" onclick="handleFeedbackRefresh(this)" style="padding: 0.5rem 1rem;">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <select id="admin-feedback-room-filter" style="min-width: 210px;">
+                                <option value="">All Rooms</option>
+                            </select>
+                            <button class="btn refresh-btn" onclick="handleFeedbackRefresh(this)" style="padding: 0.5rem 1rem;">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
                     </div>
                     <div id="admin-feedback-container">
                         <p class="text-dim" style="text-align: center; padding: 1rem;">Loading feedback...</p>

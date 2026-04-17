@@ -66,6 +66,19 @@
     font-size: 0.75rem;
 }
 
+.more-info-btn {
+    background: #ffffff !important;
+    color: #1d4ed8;
+    text-shadow: 0 0 8px rgba(59, 130, 246, 0.55), 0 0 14px rgba(96, 165, 250, 0.35);
+    font-weight: 700;
+}
+
+.more-info-btn:hover {
+    background: #f8fafc !important;
+    color: #1e40af;
+    box-shadow: 0 0 14px rgba(147, 197, 253, 0.7);
+}
+
 .admin-approve-modal {
     position: fixed;
     inset: 0;
