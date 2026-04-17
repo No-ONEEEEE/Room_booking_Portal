@@ -7,11 +7,12 @@ import API from '../api.js';
 import state from './state.js';
 import { refreshAppData } from '../app.js';
 
-const PENDING_PAGE_SIZE = 8;
-const FEEDBACK_PAGE_SIZE = 5;
+const PENDING_PAGE_SIZE = 24;
+const FEEDBACK_PAGE_SIZE = 20;
 
 let pendingCurrentPage = 1;
 let feedbackCurrentPage = 1;
+let adminActiveSection = 'pending';
 
 function formatDateTimeForDisplay(value) {
     const date = new Date(value);
@@ -168,14 +169,18 @@ function renderPaginationControls(container, currentPage, totalPages, onPageSele
         return;
     }
 
-    const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
-        pages.push(`<button class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`);
+    let startPage = Math.max(1, currentPage - 1);
+    let endPage = Math.min(totalPages, startPage + 2);
+    startPage = Math.max(1, endPage - 2);
+
+    const pageButtons = [];
+    for (let page = startPage; page <= endPage; page++) {
+        pageButtons.push(`<button class="pagination-btn ${page === currentPage ? 'active' : ''}" data-page="${page}">${page}</button>`);
     }
 
     container.innerHTML = `
         <button class="pagination-btn" data-page="${Math.max(1, currentPage - 1)}" ${currentPage === 1 ? 'disabled' : ''}>Prev</button>
-        ${pages.join('')}
+        ${pageButtons.join('')}
         <button class="pagination-btn" data-page="${Math.min(totalPages, currentPage + 1)}" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
     `;
 
@@ -191,8 +196,51 @@ function renderPaginationControls(container, currentPage, totalPages, onPageSele
     });
 }
 
+function switchAdminSection(section) {
+    adminActiveSection = section === 'feedback' ? 'feedback' : 'pending';
+
+    const pendingSection = document.getElementById('admin-pending-section');
+    const feedbackSection = document.getElementById('admin-feedback-section');
+    const summaryCards = document.getElementById('admin-summary-cards');
+    const pendingBtn = document.getElementById('admin-nav-pending');
+    const feedbackBtn = document.getElementById('admin-nav-feedback');
+
+    if (pendingSection && feedbackSection) {
+        pendingSection.classList.toggle('hidden', adminActiveSection !== 'pending');
+        feedbackSection.classList.toggle('hidden', adminActiveSection !== 'feedback');
+    }
+
+    if (pendingBtn && feedbackBtn) {
+        pendingBtn.classList.toggle('active', adminActiveSection === 'pending');
+        feedbackBtn.classList.toggle('active', adminActiveSection === 'feedback');
+    }
+
+    if (summaryCards) {
+        summaryCards.classList.toggle('hidden', adminActiveSection !== 'pending');
+    }
+}
+
+function ensureAdminSectionNavBinding() {
+    const pendingBtn = document.getElementById('admin-nav-pending');
+    const feedbackBtn = document.getElementById('admin-nav-feedback');
+
+    if (pendingBtn && pendingBtn.dataset.bound !== 'true') {
+        pendingBtn.addEventListener('click', () => switchAdminSection('pending'));
+        pendingBtn.dataset.bound = 'true';
+    }
+
+    if (feedbackBtn && feedbackBtn.dataset.bound !== 'true') {
+        feedbackBtn.addEventListener('click', () => switchAdminSection('feedback'));
+        feedbackBtn.dataset.bound = 'true';
+    }
+
+    switchAdminSection(adminActiveSection);
+}
+
 export async function refreshAdminData() {
     try {
+        ensureAdminSectionNavBinding();
+
         const { bookings: pending } = await API.getPendingRequests();
         state.pendingBookings = Array.isArray(pending) ? pending : [];
 
@@ -371,6 +419,9 @@ window.handleFeedbackRefresh = async (button) => {
         setRefreshButtonLoading(button, false);
     }
 };
+
+window.showAdminPendingSection = () => switchAdminSection('pending');
+window.showAdminFeedbackSection = () => switchAdminSection('feedback');
 
 export function initAdminForm() {
     const form = document.getElementById('admin-action-form');

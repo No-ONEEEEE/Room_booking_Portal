@@ -10,7 +10,7 @@ let roomCalendar = null;
 let performSearchHandler = null;
 let feedbackStatsByRoom = new Map();
 let feedbackStatsLoaded = false;
-const SEARCH_PAGE_SIZE = 8;
+const SEARCH_PAGE_SIZE = 24;
 let searchCurrentPage = 1;
 let searchLastResults = [];
 
@@ -220,14 +220,18 @@ function renderSearchResults(rooms) {
         return;
     }
 
-    const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
-        pages.push(`<button class="pagination-btn ${i === searchCurrentPage ? 'active' : ''}" data-page="${i}">${i}</button>`);
+    let startPage = Math.max(1, searchCurrentPage - 1);
+    let endPage = Math.min(totalPages, startPage + 2);
+    startPage = Math.max(1, endPage - 2);
+
+    const pageButtons = [];
+    for (let page = startPage; page <= endPage; page++) {
+        pageButtons.push(`<button class="pagination-btn ${page === searchCurrentPage ? 'active' : ''}" data-page="${page}">${page}</button>`);
     }
 
     paginationEl.innerHTML = `
         <button class="pagination-btn" data-page="${Math.max(1, searchCurrentPage - 1)}" ${searchCurrentPage === 1 ? 'disabled' : ''}>Prev</button>
-        ${pages.join('')}
+        ${pageButtons.join('')}
         <button class="pagination-btn" data-page="${Math.min(totalPages, searchCurrentPage + 1)}" ${searchCurrentPage === totalPages ? 'disabled' : ''}>Next</button>
     `;
     paginationEl.classList.remove('hidden');
