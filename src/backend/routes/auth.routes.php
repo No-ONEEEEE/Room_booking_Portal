@@ -9,8 +9,14 @@ function authRoutes($method, $path, $input, $query, $pdo) {
     switch ($path) {
 
         case "/login":
-            if ($method === "POST") {
-                return $auth->login($input['email'] ?? null);
+            if ($method === "GET") {
+                return $auth->redirectToCAS();
+            }
+            break;
+
+        case "/callback":
+            if ($method === "GET") {
+                return $auth->handleCASCallback($query['ticket'] ?? null);
             }
             break;
 

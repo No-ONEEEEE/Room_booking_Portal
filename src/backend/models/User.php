@@ -9,6 +9,23 @@ class User
         $this->pdo = $pdo;
     }
 
+    public function create($name, $email, $role = 'user')
+    {
+        $stmt = $this->pdo->prepare("
+            INSERT INTO users (name, email, role)
+            VALUES (?, ?, ?)
+        ");
+
+        $stmt->execute([$name, $email, $role]);
+
+        return [
+            "id" => $this->pdo->lastInsertId(),
+            "name" => $name,
+            "email" => $email,
+            "role" => $role
+        ];
+    }
+
     public function findById($id)
     {
         $stmt = $this->pdo->prepare("
