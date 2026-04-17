@@ -8,6 +8,9 @@ import state from './state.js';
 import { showToast } from './utils.js';
 import { switchView } from './navigation.js';
 
+const AVAILABLE_ROOMS_PAGE_SIZE = 18;
+let availableRoomsCurrentPage = 1;
+
 export function renderRooms() {
     // No longer directly rendering rooms on load to a generic container.
     // Dashboard can still use updateStats. We don't render to room-container immediately.
@@ -149,6 +152,7 @@ function showBookingConfirmationModal(room, bookingData) {
 
 export function renderRoomsForBooking() {
     const container = document.getElementById('room-container');
+    const paginationEl = document.getElementById('available-rooms-pagination');
     const section = document.getElementById('available-rooms-section');
     section.classList.remove('hidden');
 
@@ -158,10 +162,22 @@ export function renderRoomsForBooking() {
                 <i class="fas fa-search"></i>
                 <p>No available rooms match your criteria.</p>
             </div>`;
+        if (paginationEl) {
+            paginationEl.classList.add('hidden');
+            paginationEl.innerHTML = '';
+        }
         return;
     }
 
-    container.innerHTML = state.rooms.map(room => `
+    const totalPages = Math.max(Math.ceil(state.rooms.length / AVAILABLE_ROOMS_PAGE_SIZE), 1);
+    if (availableRoomsCurrentPage > totalPages) {
+        availableRoomsCurrentPage = totalPages;
+    }
+
+    const start = (availableRoomsCurrentPage - 1) * AVAILABLE_ROOMS_PAGE_SIZE;
+    const pagedRooms = state.rooms.slice(start, start + AVAILABLE_ROOMS_PAGE_SIZE);
+
+    container.innerHTML = pagedRooms.map(room => `
         <div class="glass-card room-card fade-in">
             <div class="room-visual">
                 <i class="fas ${getRoomIcon(room.type)}"></i>
@@ -184,6 +200,40 @@ export function renderRoomsForBooking() {
             </div>
         </div>
     `).join('');
+
+    if (!paginationEl) return;
+
+    if (totalPages <= 1) {
+        paginationEl.classList.add('hidden');
+        paginationEl.innerHTML = '';
+        return;
+    }
+
+    let startPage = Math.max(1, availableRoomsCurrentPage - 1);
+    let endPage = Math.min(totalPages, startPage + 2);
+    startPage = Math.max(1, endPage - 2);
+
+    const pageButtons = [];
+    for (let page = startPage; page <= endPage; page++) {
+        pageButtons.push(`<button class="pagination-btn ${page === availableRoomsCurrentPage ? 'active' : ''}" data-page="${page}">${page}</button>`);
+    }
+
+    paginationEl.innerHTML = `
+        <button class="pagination-btn" data-page="${Math.max(1, availableRoomsCurrentPage - 1)}" ${availableRoomsCurrentPage === 1 ? 'disabled' : ''}>Prev</button>
+        ${pageButtons.join('')}
+        <button class="pagination-btn" data-page="${Math.min(totalPages, availableRoomsCurrentPage + 1)}" ${availableRoomsCurrentPage === totalPages ? 'disabled' : ''}>Next</button>
+    `;
+    paginationEl.classList.remove('hidden');
+
+    paginationEl.querySelectorAll('[data-page]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const selectedPage = Number(btn.getAttribute('data-page'));
+            if (!Number.isNaN(selectedPage) && selectedPage !== availableRoomsCurrentPage) {
+                availableRoomsCurrentPage = selectedPage;
+                renderRoomsForBooking();
+            }
+        });
+    });
 }
 
 export async function initBookRoomForm() {
@@ -323,6 +373,7 @@ document.getElementById('book-room-form').addEventListener('submit', async (e) =
         const result = await API.getAvailableRooms(availStart, availEnd, filters);
         let rooms = result.rooms;
         state.rooms = Array.isArray(rooms) ? rooms : [];
+        availableRoomsCurrentPage = 1;
         renderRoomsForBooking();
     } catch (e) {
         console.error("Filtering failed", e);

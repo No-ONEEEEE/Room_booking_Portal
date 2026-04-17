@@ -8,6 +8,46 @@ import state from './state.js';
 import { showToast } from './utils.js';
 import { refreshAppData } from '../app.js';
 
+const MY_BOOKINGS_PAGE_SIZE = 20;
+let myBookingsCurrentPage = 1;
+
+function renderBookingsPagination(currentPage, totalPages) {
+    const paginationEl = document.getElementById('my-bookings-pagination');
+    if (!paginationEl) return;
+
+    if (totalPages <= 1) {
+        paginationEl.classList.add('hidden');
+        paginationEl.innerHTML = '';
+        return;
+    }
+
+    let startPage = Math.max(1, currentPage - 1);
+    let endPage = Math.min(totalPages, startPage + 2);
+    startPage = Math.max(1, endPage - 2);
+
+    const pageButtons = [];
+    for (let page = startPage; page <= endPage; page++) {
+        pageButtons.push(`<button class="pagination-btn ${page === currentPage ? 'active' : ''}" data-page="${page}">${page}</button>`);
+    }
+
+    paginationEl.innerHTML = `
+        <button class="pagination-btn" data-page="${Math.max(1, currentPage - 1)}" ${currentPage === 1 ? 'disabled' : ''}>Prev</button>
+        ${pageButtons.join('')}
+        <button class="pagination-btn" data-page="${Math.min(totalPages, currentPage + 1)}" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+    `;
+    paginationEl.classList.remove('hidden');
+
+    paginationEl.querySelectorAll('[data-page]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const selectedPage = Number(btn.getAttribute('data-page'));
+            if (!Number.isNaN(selectedPage) && selectedPage !== myBookingsCurrentPage) {
+                myBookingsCurrentPage = selectedPage;
+                renderBookingsList();
+            }
+        });
+    });
+}
+
 export function initBookingStatusTabs() {
     const tabs = document.querySelectorAll('.status-tab');
     tabs.forEach(tab => {
@@ -15,6 +55,7 @@ export function initBookingStatusTabs() {
             tabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             state.bookingFilter = tab.getAttribute('data-status');
+            myBookingsCurrentPage = 1;
             renderBookingsList();
         });
     });
@@ -22,6 +63,7 @@ export function initBookingStatusTabs() {
 
 export function renderBookingsList() {
     const container = document.getElementById('bookings-list');
+    const paginationEl = document.getElementById('my-bookings-pagination');
     if (!container) return;
 
     let filtered = state.bookings;
@@ -35,10 +77,22 @@ export function renderBookingsList() {
                 <i class="fas fa-calendar-times"></i>
                 <p>No ${state.bookingFilter === 'all' ? '' : state.bookingFilter + ' '}bookings found.</p>
             </div>`;
+        if (paginationEl) {
+            paginationEl.classList.add('hidden');
+            paginationEl.innerHTML = '';
+        }
         return;
     }
 
-    container.innerHTML = filtered.map(b => {
+    const totalPages = Math.max(Math.ceil(filtered.length / MY_BOOKINGS_PAGE_SIZE), 1);
+    if (myBookingsCurrentPage > totalPages) {
+        myBookingsCurrentPage = totalPages;
+    }
+
+    const start = (myBookingsCurrentPage - 1) * MY_BOOKINGS_PAGE_SIZE;
+    const pagedBookings = filtered.slice(start, start + MY_BOOKINGS_PAGE_SIZE);
+
+    container.innerHTML = pagedBookings.map(b => {
         const startDate = new Date(b.start_time);
         const endDate = new Date(b.end_time);
         const isPast = endDate <= new Date();
@@ -82,6 +136,8 @@ export function renderBookingsList() {
             </div>
         `;
     }).join('');
+
+    renderBookingsPagination(myBookingsCurrentPage, totalPages);
 }
 
 window.cancelBooking = async (id) => {

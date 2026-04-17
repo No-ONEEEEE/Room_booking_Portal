@@ -10,7 +10,7 @@ let roomCalendar = null;
 let performSearchHandler = null;
 let feedbackStatsByRoom = new Map();
 let feedbackStatsLoaded = false;
-const SEARCH_PAGE_SIZE = 24;
+const SEARCH_PAGE_SIZE = 16;
 let searchCurrentPage = 1;
 let searchLastResults = [];
 

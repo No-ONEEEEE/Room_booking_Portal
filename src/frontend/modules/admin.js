@@ -7,8 +7,8 @@ import API from '../api.js';
 import state from './state.js';
 import { refreshAppData } from '../app.js';
 
-const PENDING_PAGE_SIZE = 24;
-const FEEDBACK_PAGE_SIZE = 20;
+const PENDING_PAGE_SIZE = 16;
+const FEEDBACK_PAGE_SIZE = 14;
 
 let pendingCurrentPage = 1;
 let feedbackCurrentPage = 1;
