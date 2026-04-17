@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,27 +17,31 @@
 
 <body>
 
-    <!-- Login View -->
+    <!-- Redesigned Landing Page & CAS Login -->
     <section id="view-login">
-        <div class="glass-card" style="width: 100%; max-width: 400px; padding: 3rem;">
-            <div class="logo" style="justify-content: center; margin-bottom: 2rem;">
+        <div class="landing-card">
+            <div class="landing-logo">
                 <i class="fas fa-microchip"></i>
                 <span>ROOK</span>
             </div>
-            <h2 style="text-align: center; margin-bottom: 0.5rem;">Welcome Back</h2>
-            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">Enter your email to access
-                the terminal.</p>
 
-            <form id="login-form">
-                <div class="input-group">
-                    <label>Corporate Email</label>
-                    <input type="email" id="login-email" placeholder="name@company.com" required>
-                </div>
-                <button type="submit" class="btn btn-primary"
-                    style="width: 100%; justify-content: center; margin-top: 1rem;">
-                    Initialize Session
-                </button>
-            </form>
+            <h1 class="landing-title">Enterprise Space Intelligence</h1>
+            <p class="landing-subtitle">
+                The next generation of room management. Initialize your secure session via Central Authentication
+                Service.
+            </p>
+
+            <div class="landing-actions">
+                <a href="http://localhost:8000/src/backend/public/index.php/login" class="btn-cas">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>Login with CAS</span>
+                </a>
+            </div>
+
+            <div class="landing-footer">
+                <p>Protected by Enterprise Grade Encryption</p>
+                <p style="font-size: 0.75rem; opacity: 0.5;">ROOK v2.4.0 | Advanced Intelligence Division</p>
+            </div>
         </div>
     </section>
 
@@ -221,32 +226,42 @@
                         </div>
 
                         <!-- Expanded Refreshment Options -->
-                        <div id="refreshment-details" class="hidden" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: 12px; margin-bottom: 1.5rem; margin-top: -0.5rem; animation: slideDown 0.3s ease-out;">
-                            <p style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-blue); margin-bottom: 1rem; font-weight: 600;">Service Details</p>
-                            
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <div id="refreshment-details" class="hidden"
+                            style="padding: 1.25rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: 12px; margin-bottom: 1.5rem; margin-top: -0.5rem; animation: slideDown 0.3s ease-out;">
+                            <p
+                                style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-blue); margin-bottom: 1rem; font-weight: 600;">
+                                Service Details</p>
+
+                            <div
+                                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                                     <input type="checkbox" id="refresh-tea" style="width: auto; cursor: pointer;">
-                                    <label for="refresh-tea" style="margin: 0; font-size: 0.9rem; cursor: pointer;">Tea</label>
+                                    <label for="refresh-tea"
+                                        style="margin: 0; font-size: 0.9rem; cursor: pointer;">Tea</label>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                                     <input type="checkbox" id="refresh-coffee" style="width: auto; cursor: pointer;">
-                                    <label for="refresh-coffee" style="margin: 0; font-size: 0.9rem; cursor: pointer;">Coffee</label>
+                                    <label for="refresh-coffee"
+                                        style="margin: 0; font-size: 0.9rem; cursor: pointer;">Coffee</label>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                                     <input type="checkbox" id="refresh-snacks" style="width: auto; cursor: pointer;">
-                                    <label for="refresh-snacks" style="margin: 0; font-size: 0.9rem; cursor: pointer;">Snacks</label>
+                                    <label for="refresh-snacks"
+                                        style="margin: 0; font-size: 0.9rem; cursor: pointer;">Snacks</label>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                                     <input type="checkbox" id="refresh-lunch" style="width: auto; cursor: pointer;">
-                                    <label for="refresh-lunch" style="margin: 0; font-size: 0.9rem; cursor: pointer;">Working Lunch</label>
+                                    <label for="refresh-lunch"
+                                        style="margin: 0; font-size: 0.9rem; cursor: pointer;">Working Lunch</label>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                                     <input type="checkbox" id="refresh-ontable" style="width: auto; cursor: pointer;">
-                                    <label for="refresh-ontable" style="margin: 0; font-size: 0.9rem; cursor: pointer;">On-table refreshments</label>
+                                    <label for="refresh-ontable"
+                                        style="margin: 0; font-size: 0.9rem; cursor: pointer;">On-table
+                                        refreshments</label>
                                 </div>
                             </div>
-                            
+
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                                 <div class="input-group">
                                     <label>Quantity</label>
@@ -391,8 +406,10 @@
                 </div>
 
                 <div class="admin-section-nav">
-                    <button id="admin-nav-pending" type="button" class="btn admin-section-btn active" onclick="showAdminPendingSection()">Pending Requests</button>
-                    <button id="admin-nav-feedback" type="button" class="btn admin-section-btn" onclick="showAdminFeedbackSection()">User Feedback</button>
+                    <button id="admin-nav-pending" type="button" class="btn admin-section-btn active"
+                        onclick="showAdminPendingSection()">Pending Requests</button>
+                    <button id="admin-nav-feedback" type="button" class="btn admin-section-btn"
+                        onclick="showAdminFeedbackSection()">User Feedback</button>
                 </div>
 
                 <div id="admin-summary-cards" class="stats-grid admin-only hidden">
@@ -407,9 +424,9 @@
                 </div>
 
                 <div id="admin-pending-section" class="glass-card">
-                    <div
-                        style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 2rem;">
-                        <button class="btn refresh-btn" onclick="handleAdminRefresh(this)" style="padding: 0.5rem 1rem;">
+                    <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 2rem;">
+                        <button class="btn refresh-btn" onclick="handleAdminRefresh(this)"
+                            style="padding: 0.5rem 1rem;">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
                     </div>
@@ -435,13 +452,13 @@
 
                 <!-- Admin Feedback Section -->
                 <div id="admin-feedback-section" class="glass-card hidden" style="margin-top: 2rem;">
-                    <div
-                        style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 2rem;">
+                    <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 2rem;">
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
                             <select id="admin-feedback-room-filter" style="min-width: 210px;">
                                 <option value="">All Rooms</option>
                             </select>
-                            <button class="btn refresh-btn" onclick="handleFeedbackRefresh(this)" style="padding: 0.5rem 1rem;">
+                            <button class="btn refresh-btn" onclick="handleFeedbackRefresh(this)"
+                                style="padding: 0.5rem 1rem;">
                                 <i class="fas fa-sync-alt"></i> Refresh
                             </button>
                         </div>
@@ -650,13 +667,14 @@
             </form>
         </div>
     </div>
-    
+
     <!-- User Response Modal -->
     <div id="user-response-modal" class="hidden"
         style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
         <div class="glass-card" style="width: 100%; max-width: 450px;">
             <h2 id="user-response-title">Provide Clarification</h2>
-            <p id="user-response-desc" class="text-secondary" style="margin-bottom: 1.5rem;">The admin has requested more information regarding your booking.</p>
+            <p id="user-response-desc" class="text-secondary" style="margin-bottom: 1.5rem;">The admin has requested
+                more information regarding your booking.</p>
 
             <form id="user-response-form">
                 <input type="hidden" id="user-response-booking-id">
