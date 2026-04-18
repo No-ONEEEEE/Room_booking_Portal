@@ -75,7 +75,7 @@ function sendBookingApprovalEmail($userEmail, $userName, $booking) {
     <body>
         <div class='container'>
             <div class='header'>
-                <h1>✓ Booking Approved</h1>
+                <h1>Booking Approved</h1>
             </div>
             <div class='content'>
                 <p>Dear " . htmlspecialchars($userName) . ",</p>
@@ -136,7 +136,7 @@ function sendBookingRejectionEmail($userEmail, $userName, $booking, $reason) {
     <body>
         <div class='container'>
             <div class='header'>
-                <h1>✗ Booking Declined</h1>
+                <h1>Booking Declined</h1>
             </div>
             <div class='content'>
                 <p>Dear " . htmlspecialchars($userName) . ",</p>
@@ -296,7 +296,7 @@ function sendRefreshmentRequestEmailToCDS($cdsEmail, $booking, $user) {
     <body>
         <div class='container'>
             <div class='header'>
-                <h1>🍽️ Refreshment Service Request</h1>
+                <h1>Refreshment Service Request</h1>
             </div>
             <div class='content'>
                 <p>Hello,</p>
