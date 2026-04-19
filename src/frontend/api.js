@@ -8,8 +8,9 @@ const API_BASE_URL = '../backend/public';
 /**
  * Enhanced Fetch Wrapper
  */
-async function apiRequest(endpoint, method = 'GET', data = null) {
-    const options = {
+async function apiRequest(endpoint, method = 'GET', data = null, options = {}) {
+    const { silent = false } = options;
+    const fetchOptions = {
         method,
         headers: {
             'Content-Type': 'application/json',
@@ -18,11 +19,11 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
     };
 
     if (data) {
-        options.body = JSON.stringify(data);
+        fetchOptions.body = JSON.stringify(data);
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, fetchOptions);
         const result = await response.json();
 
         if (!response.ok || !result.success) {
@@ -32,7 +33,9 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
         return result.data;
     } catch (error) {
         console.error(`API Error [${endpoint}]:`, error);
-        showToast(error.message, 'error');
+        if (!silent) {
+            showToast(error.message, 'error');
+        }
         throw error;
     }
 }
@@ -62,8 +65,8 @@ const API = {
     // Auth
     login: (email) => apiRequest('/login', 'POST', { email }),
     logout: () => apiRequest('/logout', 'POST'),
-    me: () => apiRequest('/me'),
-    getUsers: () => apiRequest('/users'),
+    me: (options = {}) => apiRequest('/me', 'GET', null, options),
+    getUsers: (options = {}) => apiRequest('/users', 'GET', null, options),
 
     // Rooms
     getRooms: (filters = {}) => {
@@ -108,7 +111,7 @@ const API = {
     getAllFeedback: () => apiRequest('/feedback'),
 
     // Notifications
-    getNotifications: () => apiRequest('/notifications'),
+    getNotifications: (options = {}) => apiRequest('/notifications', 'GET', null, options),
     markNotificationAsRead: (id) => apiRequest(`/notifications/${id}/read`, 'PATCH'),
     markAllNotificationsAsRead: () => apiRequest('/notifications/mark-all-read', 'PATCH'),
     deleteNotification: (id) => apiRequest(`/notifications/${id}`, 'DELETE')

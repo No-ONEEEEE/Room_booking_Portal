@@ -238,7 +238,7 @@ export function renderRoomsForBooking() {
 
 export async function initBookRoomForm() {
     try {
-        const { users } = await API.getUsers();
+        const { users } = await API.getUsers({ silent: true });
         const list = document.getElementById('book-participants-list');
         list.innerHTML = users.filter(u => u.id !== state.user.id).map(u => `
             <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 0.75rem; width: 100%; padding: 0.25rem 0;">

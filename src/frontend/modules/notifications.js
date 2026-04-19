@@ -6,9 +6,9 @@
 import API from '../api.js';
 import state from './state.js';
 
-export async function fetchNotifications() {
+export async function fetchNotifications(options = {}) {
     try {
-        const { notifications } = await API.getNotifications();
+        const { notifications } = await API.getNotifications(options);
         state.notifications = Array.isArray(notifications) ? notifications : [];
         updateNotificationIcon();
     } catch (error) {
@@ -166,8 +166,8 @@ export function initNotifications() {
         });
     }
 
-    // Initial fetch
-    fetchNotifications();
+    // Initial fetch (silent to avoid error if not authenticated)
+    fetchNotifications({ silent: true });
 
     // Init form
     const responseForm = document.getElementById('user-response-form');

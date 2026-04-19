@@ -13,9 +13,9 @@ import { initBookRoomForm } from './rooms.js';
 export async function initAuth() {
     const loginView = document.getElementById('view-login');
 
-    // Check if user is already logged in (session check)
+    // Check if user is already logged in (session check) - use silent mode
     try {
-        const { user } = await API.me();
+        const { user } = await API.me({ silent: true });
         if (user && user.id) {
             handleLoginSuccess(user);
         } else {
