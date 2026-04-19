@@ -30,8 +30,8 @@ function seedDatabase($pdo) {
         echo "Seeding users...\n";
 
         $users = [
-            ['John Doe','john@example.com','user'],
-            ['Jane Smith','jane@example.com','user'],
+            ['John Doe','chanakyagaming123@gmail.com','user'],
+            ['Jane Smith','vasishta.serla@students.iiit.ac.in','user'],
             ['Mike Johnson','mike@example.com','user'],
             ['Sarah Williams','sarah@example.com','user'],
             ['Tom Brown','tom@example.com','user'],
@@ -50,7 +50,7 @@ function seedDatabase($pdo) {
             ['Nancy Walker','nancy@example.com','user'],
             ['Matthew Hall','matthew@example.com','user'],
             ['Karen Young','karen@example.com','user'],
-            ['Admin User','admin@example.com','admin'],
+            ['Admin User','chanakyamanikanta.a@students.iiit.ac.in','admin'],
             ['Admin Two','reddymahanth438@gmail.com','admin']
         ];
 
