@@ -21,7 +21,7 @@ function authRoutes($method, $path, $input, $query, $pdo) {
             break;
 
         case "/logout":
-            if ($method === "POST") {
+            if ($method === "GET" || $method === "POST") {
                 return $auth->logout();
             }
             break;

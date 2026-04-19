@@ -75,9 +75,7 @@ export function initLogout() {
 
     btn.onclick = async (e) => {
         e.preventDefault();
-        try {
-            await API.logout();
-            location.reload(); // Hard refresh to reset state
-        } catch (e) { }
+        // Redirect to logout endpoint which handles CAS logout
+        window.location.href = '../backend/public/index.php/logout';
     };
 }

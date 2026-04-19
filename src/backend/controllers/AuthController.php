@@ -45,7 +45,10 @@ class AuthController {
         session_unset();
         session_destroy();
 
-        return success("Logged out successfully");
+        // Redirect to CAS logout to clear CAS session
+        $casLogoutUrl = "https://login.iiit.ac.in/cas/logout?service=" . urlencode("http://localhost:8000/src/frontend/index.html");
+        header("Location: " . $casLogoutUrl);
+        exit();
     }
 
     public function currentUser() {
