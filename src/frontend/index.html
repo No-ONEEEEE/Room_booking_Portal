@@ -754,6 +754,50 @@
         </div>
     </div>
 
+    <!-- Cancel Booking Confirmation Modal -->
+    <div id="cancel-booking-modal" class="hidden"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="width: 100%; max-width: 450px;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 1.5rem; color: #ef4444;"></i>
+                </div>
+                <h2 style="margin: 0;">Cancel Booking?</h2>
+            </div>
+            <p class="text-secondary" style="margin-bottom: 1.5rem;">Are you sure you want to cancel this booking? The room slot will be freed.</p>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-primary" style="flex: 1;" id="confirm-cancel-btn">
+                    <i class="fas fa-check"></i> Yes, Cancel
+                </button>
+                <button class="btn" style="background: rgba(255,255,255,0.1); flex: 1;" id="cancel-cancel-btn">
+                    <i class="fas fa-times"></i> Keep Booking
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mark Completed Confirmation Modal -->
+    <div id="mark-completed-modal" class="hidden"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="width: 100%; max-width: 450px;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(34, 197, 94, 0.1); display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-check-circle" style="font-size: 1.5rem; color: #22c55e;"></i>
+                </div>
+                <h2 style="margin: 0;">Mark as Completed?</h2>
+            </div>
+            <p class="text-secondary" style="margin-bottom: 1.5rem;">Mark this booking as completed. You will be able to leave feedback after this.</p>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-primary" style="flex: 1; background: #22c55e;" id="confirm-complete-btn">
+                    <i class="fas fa-check"></i> Mark Completed
+                </button>
+                <button class="btn" style="background: rgba(255,255,255,0.1); flex: 1;" id="cancel-complete-btn">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="app.js"></script>
 </body>
 

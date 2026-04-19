@@ -162,21 +162,69 @@ export function renderBookingsList() {
 }
 
 window.cancelBooking = async (id) => {
-    if (!confirm("Are you sure you want to cancel this booking? The room slot will be freed.")) return;
-    try {
-        await API.cancelBooking(id);
-        showToast("Booking cancelled successfully.", "info");
-        await refreshAppData();
-    } catch (e) { }
+    const modal = document.getElementById('cancel-booking-modal');
+    const confirmBtn = document.getElementById('confirm-cancel-btn');
+    const cancelBtn = document.getElementById('cancel-cancel-btn');
+
+    modal.classList.remove('hidden');
+
+    return new Promise((resolve) => {
+        const handleConfirm = async () => {
+            modal.classList.add('hidden');
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+
+            try {
+                await API.cancelBooking(id);
+                showToast("Booking cancelled successfully.", "info");
+                await refreshAppData();
+            } catch (e) { }
+            resolve();
+        };
+
+        const handleCancel = () => {
+            modal.classList.add('hidden');
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+            resolve();
+        };
+
+        confirmBtn.addEventListener('click', handleConfirm);
+        cancelBtn.addEventListener('click', handleCancel);
+    });
 };
 
 window.markBookingCompleted = async (id) => {
-    if (!confirm("Mark this booking as completed?")) return;
-    try {
-        await API.markCompleted(id);
-        showToast("Booking marked as completed. You can now leave feedback!", "info");
-        await refreshAppData();
-    } catch (e) { }
+    const modal = document.getElementById('mark-completed-modal');
+    const confirmBtn = document.getElementById('confirm-complete-btn');
+    const cancelBtn = document.getElementById('cancel-complete-btn');
+
+    modal.classList.remove('hidden');
+
+    return new Promise((resolve) => {
+        const handleConfirm = async () => {
+            modal.classList.add('hidden');
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+
+            try {
+                await API.markCompleted(id);
+                showToast("Booking marked as completed. You can now leave feedback!", "info");
+                await refreshAppData();
+            } catch (e) { }
+            resolve();
+        };
+
+        const handleCancel = () => {
+            modal.classList.add('hidden');
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+            resolve();
+        };
+
+        confirmBtn.addEventListener('click', handleConfirm);
+        cancelBtn.addEventListener('click', handleCancel);
+    });
 };
 
 export function initBookingListeners() {} // stub
