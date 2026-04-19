@@ -11,7 +11,8 @@ use PHPMailer\PHPMailer\Exception;
 /**
  * Send an email using PHPMailer with SMTP
  */
-function sendEmail($to, $subject, $message) {
+function sendEmail($to, $subject, $message)
+{
     $config = require __DIR__ . '/../config/mail.php';
 
     if (empty($config['smtp_username']) || empty($config['smtp_password'])) {
@@ -23,19 +24,19 @@ function sendEmail($to, $subject, $message) {
 
     try {
         $mail->isSMTP();
-        $mail->Host       = $config['smtp_host'];
-        $mail->SMTPAuth   = $config['smtp_auth'];
-        $mail->Username   = $config['smtp_username'];
-        $mail->Password   = $config['smtp_password'];
+        $mail->Host = $config['smtp_host'];
+        $mail->SMTPAuth = $config['smtp_auth'];
+        $mail->Username = $config['smtp_username'];
+        $mail->Password = $config['smtp_password'];
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = $config['smtp_port'];
+        $mail->Port = $config['smtp_port'];
 
         $mail->setFrom($config['from_email'], $config['from_name']);
         $mail->addAddress($to);
 
         $mail->isHTML(true);
         $mail->Subject = $subject;
-        $mail->Body    = $message;
+        $mail->Body = $message;
 
         $mail->send();
         error_log("Email sent successfully to: $to");
@@ -54,9 +55,10 @@ function sendEmail($to, $subject, $message) {
  * @param array $booking Booking details
  * @return bool
  */
-function sendBookingApprovalEmail($userEmail, $userName, $booking) {
+function sendBookingApprovalEmail($userEmail, $userName, $booking)
+{
     $subject = "Booking Approved - Room Booking System";
-    
+
     $message = "
     <!DOCTYPE html>
     <html>
@@ -101,7 +103,7 @@ function sendBookingApprovalEmail($userEmail, $userName, $booking) {
     </body>
     </html>
     ";
-    
+
     return sendEmail($userEmail, $subject, $message);
 }
 
@@ -114,9 +116,10 @@ function sendBookingApprovalEmail($userEmail, $userName, $booking) {
  * @param string $reason Reason for rejection
  * @return bool
  */
-function sendBookingRejectionEmail($userEmail, $userName, $booking, $reason) {
+function sendBookingRejectionEmail($userEmail, $userName, $booking, $reason)
+{
     $subject = "Booking Declined - Room Booking System";
-    
+
     $message = "
     <!DOCTYPE html>
     <html>
@@ -166,7 +169,7 @@ function sendBookingRejectionEmail($userEmail, $userName, $booking, $reason) {
     </body>
     </html>
     ";
-    
+
     return sendEmail($userEmail, $subject, $message);
 }
 
@@ -179,9 +182,10 @@ function sendBookingRejectionEmail($userEmail, $userName, $booking, $reason) {
  * @param array $user User details
  * @return bool
  */
-function sendBookingRequestEmailToAdmin($adminEmail, $adminName, $booking, $user) {
+function sendBookingRequestEmailToAdmin($adminEmail, $adminName, $booking, $user)
+{
     $subject = "New Booking Request - " . htmlspecialchars($booking['room_name']) . " - Room Booking System";
-    
+
     $message = "
     <!DOCTYPE html>
     <html>
@@ -202,7 +206,7 @@ function sendBookingRequestEmailToAdmin($adminEmail, $adminName, $booking, $user
     <body>
         <div class='container'>
             <div class='header'>
-                <h1>📋 New Booking Request</h1>
+                <h1>New Booking Request</h1>
             </div>
             <div class='content'>
                 <p>Hello " . htmlspecialchars($adminName) . ",</p>
@@ -235,7 +239,7 @@ function sendBookingRequestEmailToAdmin($adminEmail, $adminName, $booking, $user
     </body>
     </html>
     ";
-    
+
     return sendEmail($adminEmail, $subject, $message);
 }
 
@@ -247,9 +251,10 @@ function sendBookingRequestEmailToAdmin($adminEmail, $adminName, $booking, $user
  * @param array $user User details
  * @return bool
  */
-function sendRefreshmentRequestEmailToCDS($cdsEmail, $booking, $user) {
+function sendRefreshmentRequestEmailToCDS($cdsEmail, $booking, $user)
+{
     $subject = "Refreshment Request - Booking #" . htmlspecialchars($booking['id']) . " - Room Booking System";
-    
+
     $refreshmentDetails = [];
     if (!empty($booking['refreshment_details'])) {
         if (is_string($booking['refreshment_details'])) {
@@ -258,7 +263,7 @@ function sendRefreshmentRequestEmailToCDS($cdsEmail, $booking, $user) {
             $refreshmentDetails = $booking['refreshment_details'];
         }
     }
-    
+
     $refreshmentItemsList = '';
     if (!empty($refreshmentDetails)) {
         $refreshmentItemsList = '<ul>';
@@ -274,7 +279,7 @@ function sendRefreshmentRequestEmailToCDS($cdsEmail, $booking, $user) {
         }
         $refreshmentItemsList .= '</ul>';
     }
-    
+
     $message = "
     <!DOCTYPE html>
     <html>
@@ -329,6 +334,6 @@ function sendRefreshmentRequestEmailToCDS($cdsEmail, $booking, $user) {
     </body>
     </html>
     ";
-    
+
     return sendEmail($cdsEmail, $subject, $message);
 }
