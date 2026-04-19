@@ -255,6 +255,20 @@ export async function initBookRoomForm() {
                 refreshmentDetails.classList.toggle('hidden', !snacksCheckbox.checked);
             });
         }
+
+        // Set minimum date/time to current date/time to prevent selecting past dates
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+        const startTimeInput = document.getElementById('book-start-time');
+        const endTimeInput = document.getElementById('book-end-time');
+        if (startTimeInput) startTimeInput.min = minDateTime;
+        if (endTimeInput) endTimeInput.min = minDateTime;
     } catch (error) {
         console.error("Failed to fetch users", error);
     }
@@ -354,6 +368,24 @@ export function initFilterListeners() {} // stub
 document.getElementById('book-room-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const availStart = document.getElementById('book-start-time').value;
+    const availEnd = document.getElementById('book-end-time').value;
+
+    // Validate that dates are not in the past
+    const now = new Date();
+    const startDateTime = new Date(availStart);
+    const endDateTime = new Date(availEnd);
+
+    if (startDateTime < now) {
+        showToast("Date selected must be current or in the future", "error");
+        return;
+    }
+
+    if (endDateTime < now) {
+        showToast("End date must be current or in the future", "error");
+        return;
+    }
+
     // Set loading state
     const btn = document.getElementById('btn-check-availability');
     const originalText = btn.textContent;
@@ -363,8 +395,6 @@ document.getElementById('book-room-form').addEventListener('submit', async (e) =
     const type = document.getElementById('book-room-type').value;
     const name = document.getElementById('book-room-name').value;
     const capacity = document.getElementById('book-expected-number').value;
-    const availStart = document.getElementById('book-start-time').value;
-    const availEnd = document.getElementById('book-end-time').value;
 
     const filters = {};
     if (type) filters.type = type;
