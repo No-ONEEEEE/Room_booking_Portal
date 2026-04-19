@@ -166,7 +166,7 @@ export function initNotifications() {
         });
     }
 
-    // Initial fetch (silent to avoid error if not authenticated)
+    // Initial fetch
     fetchNotifications({ silent: true });
 
     // Init form
