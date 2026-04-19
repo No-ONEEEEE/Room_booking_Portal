@@ -188,6 +188,10 @@
                             <input type="text" id="book-purpose" placeholder="e.g. Quantum Computing Sprint" required>
                         </div>
                         <div class="input-group">
+                            <label>Room Name (Optional)</label>
+                            <input type="text" id="book-room-name" placeholder="Search by specific room name...">
+                        </div>
+                        <div class="input-group">
                             <label>Type of Room</label>
                             <select id="book-room-type">
                                 <option value="">Any Type</option>
@@ -377,9 +381,12 @@
 
                 <div id="room-schedule-container" class="hidden">
                     <div class="glass-card">
-                        <div class="room-schedule-toolbar">
+                        <div class="room-schedule-toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                             <button class="btn room-schedule-back-btn" type="button" onclick="goBackFromRoomSchedule()">
                                 <i class="fas fa-arrow-left"></i> Go Back
+                            </button>
+                            <button class="btn btn-primary" type="button" id="btn-book-from-schedule" onclick="bookCurrentRoom()">
+                                <i class="fas fa-calendar-plus"></i> Book This Room
                             </button>
                         </div>
                         <div id="room-calendar"></div>

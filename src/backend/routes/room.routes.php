@@ -22,7 +22,8 @@ function roomRoutes($method, $path, $input, $query, $pdo)
                     $query['startTime'] ?? null,
                     $query['endTime'] ?? null,
                     $query['type'] ?? null,
-                    $query['capacity'] ?? null
+                    $query['capacity'] ?? null,
+                    $query['name'] ?? null
                 );
             }
             break;

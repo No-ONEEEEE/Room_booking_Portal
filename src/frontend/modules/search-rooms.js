@@ -13,6 +13,8 @@ let feedbackStatsLoaded = false;
 const SEARCH_PAGE_SIZE = 16;
 let searchCurrentPage = 1;
 let searchLastResults = [];
+let currentRoomId = null;
+let currentRoomName = null;
 
 function parseDateSafe(value) {
     const parsed = new Date(String(value).replace(' ', 'T'));
@@ -248,11 +250,34 @@ function renderSearchResults(rooms) {
 }
 
 window.selectRoomForSchedule = async (roomId, roomName) => {
+    currentRoomId = roomId;
+    currentRoomName = roomName;
     document.getElementById('search-filters-card')?.classList.add('hidden');
     document.getElementById('search-results-list').classList.add('hidden');
     document.getElementById('search-results-pagination')?.classList.add('hidden');
     document.getElementById('room-schedule-container').classList.remove('hidden');
     await loadRoomSchedule(roomId);
+};
+
+window.bookCurrentRoom = () => {
+    if (!currentRoomName) return;
+    
+    const roomNameInput = document.getElementById('book-room-name');
+    const roomTypeSelect = document.getElementById('book-room-type');
+    const roomCapacityInput = document.getElementById('book-expected-number');
+
+    if (roomNameInput) roomNameInput.value = currentRoomName;
+    if (roomTypeSelect) roomTypeSelect.value = '';
+    // We don't necessarily want to clear capacity if they already knew how many people, 
+    // but maybe it's safer to let them re-enter if they are coming from a specific room search.
+    // Actually, let's keep capacity if it was there, or clear it if it's confusing.
+    // Let's just clear type to be safe.
+    
+    // Trigger navigation
+    const navItem = document.querySelector('.nav-item[data-view="rooms"]');
+    if (navItem) {
+        navItem.click();
+    }
 };
 
 window.goBackFromRoomSchedule = () => {

@@ -361,12 +361,14 @@ document.getElementById('book-room-form').addEventListener('submit', async (e) =
     btn.disabled = true;
 
     const type = document.getElementById('book-room-type').value;
+    const name = document.getElementById('book-room-name').value;
     const capacity = document.getElementById('book-expected-number').value;
     const availStart = document.getElementById('book-start-time').value;
     const availEnd = document.getElementById('book-end-time').value;
 
     const filters = {};
     if (type) filters.type = type;
+    if (name) filters.name = name;
     if (capacity) filters.capacity = capacity;
 
     try {

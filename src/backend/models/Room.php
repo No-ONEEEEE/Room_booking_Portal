@@ -65,7 +65,7 @@ class Room {
         }
     }
 
-    public function getAvailableRooms($start_time, $end_time, $type = null, $capacity = null) {
+    public function getAvailableRooms($start_time, $end_time, $type = null, $capacity = null, $name = null) {
         $query = "
             SELECT *
             FROM rooms r
@@ -89,6 +89,11 @@ class Room {
         if ($capacity !== null) {
             $query .= " AND r.capacity >= ?";
             $params[] = $capacity;
+        }
+
+        if ($name !== null && $name !== '') {
+            $query .= " AND r.room_name LIKE ?";
+            $params[] = '%' . $name . '%';
         }
 
         $query .= " ORDER BY r.id ASC";

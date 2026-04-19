@@ -148,7 +148,7 @@ class RoomController
         );
     }
 
-    public function getAvailableRooms($startTime, $endTime, $type = null, $capacity = null)
+    public function getAvailableRooms($startTime, $endTime, $type = null, $capacity = null, $name = null)
     {
         if (!$startTime || !$endTime) {
             return error(
@@ -201,7 +201,7 @@ class RoomController
         $startTime = date('Y-m-d H:i:s', $start);
         $endTime = date('Y-m-d H:i:s', $end);
 
-        $rooms = $this->roomModel->getAvailableRooms($startTime, $endTime, $type, $capacity);
+        $rooms = $this->roomModel->getAvailableRooms($startTime, $endTime, $type, $capacity, $name);
 
         return success(
             "Available rooms fetched",
