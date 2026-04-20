@@ -33,6 +33,7 @@ function ensureStatsFilters() {
 
     const monthSelect = document.getElementById('stat-month-select');
     const yearSelect = document.getElementById('stat-year-select');
+    const roomTypeSelect = document.getElementById('stat-room-type-select');
     const roomSelect = document.getElementById('stat-room-select');
 
     if (!monthSelect || !yearSelect || !roomSelect) return;
@@ -66,9 +67,16 @@ function ensureStatsFilters() {
     const now = new Date();
     monthSelect.value = '';
     yearSelect.value = String(now.getFullYear());
+    if (roomTypeSelect) roomTypeSelect.value = '';
 
     monthSelect.addEventListener('change', updateStats);
     yearSelect.addEventListener('change', updateStats);
+    if (roomTypeSelect) {
+        roomTypeSelect.addEventListener('change', () => {
+            syncRoomFilterOptions();
+            updateStats();
+        });
+    }
     roomSelect.addEventListener('change', updateStats);
 
     statsFiltersInitialized = true;
@@ -87,7 +95,11 @@ function syncRoomFilterOptions() {
     allRoomsOption.textContent = 'All Rooms';
     roomSelect.appendChild(allRoomsOption);
 
+    const roomTypeSelect = document.getElementById('stat-room-type-select');
+    const selectedType = roomTypeSelect ? roomTypeSelect.value : '';
+
     [...state.rooms]
+        .filter(room => selectedType === '' || room.type === selectedType)
         .sort((a, b) => String(a.room_name || '').localeCompare(String(b.room_name || '')))
         .forEach(room => {
             const option = document.createElement('option');
@@ -135,6 +147,8 @@ function getSelectedDateRange() {
 function getBookingsBySelectedFilters() {
     const { start, end } = getSelectedDateRange();
     const selectedRoomId = getSelectedRoomId();
+    const roomTypeSelect = document.getElementById('stat-room-type-select');
+    const selectedType = roomTypeSelect ? roomTypeSelect.value : '';
 
     return state.bookings.filter(b => {
         const bookingStart = parseBookingDate(b.start_time);
@@ -143,6 +157,10 @@ function getBookingsBySelectedFilters() {
         if (!bookingStart || !bookingEnd) return false;
 
         if (selectedRoomId !== null && b.room_id !== selectedRoomId) return false;
+        if (selectedType !== '') {
+            const room = state.rooms.find(r => r.id === b.room_id);
+            if (!room || room.type !== selectedType) return false;
+        }
 
         return bookingStart < end && bookingEnd >= start;
     });
@@ -307,14 +325,50 @@ export function updateStats() {
             .map(b => b.room_id)
     );
 
+    const roomTypeSelect = document.getElementById('stat-room-type-select');
+    const selectedType = roomTypeSelect ? roomTypeSelect.value : '';
+
+    let totalAvailableRooms = state.rooms.length;
+    if (selectedType !== '') {
+        totalAvailableRooms = state.rooms.filter(r => r.type === selectedType).length;
+    }
+
     const occupiedCount = currentlyOccupiedRoomIds.size;
-    const availableCount = Math.max(state.rooms.length - occupiedCount, 0);
+    let availableCount = Math.max(totalAvailableRooms - occupiedCount, 0);
+
+    if (selectedType !== '') {
+        let occupiedOfType = 0;
+        currentlyOccupiedRoomIds.forEach(roomId => {
+            const r = state.rooms.find(room => room.id === roomId);
+            if (r && r.type === selectedType) {
+                occupiedOfType++;
+            }
+        });
+        availableCount = Math.max(totalAvailableRooms - occupiedOfType, 0);
+        if (occupiedRooms) occupiedRooms.textContent = occupiedOfType;
+    } else {
+        if (occupiedRooms) occupiedRooms.textContent = occupiedCount;
+    }
+
+    let filteredActiveBookingsCount = allActiveBookingsCount;
+    if (selectedType !== '') {
+         filteredActiveBookingsCount = state.bookings.filter(b => {
+            if (b.status !== 'approved') return false;
+            const r = state.rooms.find(room => room.id === b.room_id);
+            if (!r || r.type !== selectedType) return false;
+
+            const bookingStart = parseBookingDate(b.start_time);
+            const bookingEnd = parseBookingDate(b.end_time);
+
+            if (!bookingStart || !bookingEnd) return false;
+            return bookingStart <= now && bookingEnd >= now;
+        }).length;
+    }
 
     if (totalRequests) totalRequests.textContent = bookingsInRange.length;
     if (totalAccepted) totalAccepted.textContent = acceptedBookingsInRange.length;
-    if (activeBookings) activeBookings.textContent = allActiveBookingsCount;
+    if (activeBookings) activeBookings.textContent = filteredActiveBookingsCount;
     if (availableRooms) availableRooms.textContent = availableCount;
-    if (occupiedRooms) occupiedRooms.textContent = occupiedCount;
 
     updateBookingAnalytics(bookingsInRange);
 }
