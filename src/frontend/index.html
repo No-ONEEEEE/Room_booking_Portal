@@ -11,6 +11,8 @@
     <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
@@ -416,9 +418,14 @@
 
             <!-- Admin Panel View -->
             <section id="view-admin" class="page-view hidden fade-in">
-                <div class="dashboard-header">
-                    <h1>Administrative Control</h1>
-                    <p class="text-secondary">Process room requests and manage system assets.</p>
+                <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h1>Administrative Control</h1>
+                        <p class="text-secondary">Process room requests and manage system assets.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="downloadTodaySchedulePDF()">
+                        <i class="fas fa-file-pdf"></i> Download Today's Schedule
+                    </button>
                 </div>
 
                 <div class="admin-section-nav">

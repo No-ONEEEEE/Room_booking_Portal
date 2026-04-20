@@ -436,6 +436,72 @@ window.handleFeedbackRefresh = async (button) => {
 window.showAdminPendingSection = () => switchAdminSection('pending');
 window.showAdminFeedbackSection = () => switchAdminSection('feedback');
 
+window.downloadTodaySchedulePDF = () => {
+    try {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            alert("PDF library is not loaded yet. Please try again in a moment.");
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        
+        const todayBookings = state.bookings.filter(b => {
+            if (b.status !== 'approved') return false;
+            
+            const bStart = new Date(String(b.start_time).replace(' ', 'T'));
+            const bEnd = new Date(String(b.end_time).replace(' ', 'T'));
+            
+            if (Number.isNaN(bStart.getTime()) || Number.isNaN(bEnd.getTime())) return false;
+            
+            return bStart <= endOfDay && bEnd >= startOfDay;
+        });
+
+        todayBookings.sort((a, b) => new Date(String(a.start_time).replace(' ', 'T')) - new Date(String(b.start_time).replace(' ', 'T')));
+
+        doc.setFontSize(18);
+        doc.text("Today's Room Schedule", 14, 22);
+        doc.setFontSize(11);
+        doc.setTextColor(100);
+        doc.text(`Generated on: ${now.toLocaleString()}`, 14, 30);
+
+        const tableColumn = ["User", "Room", "Time Slot", "Purpose"];
+        const tableRows = [];
+
+        todayBookings.forEach(b => {
+            const bStart = new Date(String(b.start_time).replace(' ', 'T'));
+            const bEnd = new Date(String(b.end_time).replace(' ', 'T'));
+            const timeSlot = `${bStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${bEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+            const roomData = b.room_name || `Room ${b.room_id}`;
+            const userData = b.user_name || 'Unknown User';
+            const purposeData = b.purpose || '-';
+            tableRows.push([userData, roomData, timeSlot, purposeData]);
+        });
+
+        if (tableRows.length === 0) {
+            doc.text("No meetings scheduled for today.", 14, 40);
+        } else {
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 40,
+                theme: 'striped',
+                styles: { fontSize: 10, cellPadding: 3 },
+                headStyles: { fillColor: [30, 41, 59] }
+            });
+        }
+
+        doc.save(`Schedule_${now.toISOString().split('T')[0]}.pdf`);
+    } catch (e) {
+        console.error("PDF Generation failed:", e);
+        alert("Failed to generate PDF. Check console for details.");
+    }
+};
+
 export function initAdminForm() {
     const form = document.getElementById('admin-action-form');
     if (!form) return;
