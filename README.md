@@ -1,87 +1,304 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/4T_GxXnv)
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=22369757&assignment_repo_type=AssignmentRepo)
-# DASS Spring 2026 Template
+# ROOK
 
-This template includes an Excel-based status tracker and an automated weekly snapshot workflow for submissions.
+<div align="center">
+	<h3>Advanced Room Booking Intelligence Platform</h3>
+	<p>
+		CAS-secured authentication • role-aware approvals • live availability engine • analytics + calendar command center
+	</p>
 
-## Quick Start
-1. Create/update `docs/StatusTracker.xls` in Microsoft Excel (binary file; do not replace with CSV).
-2. Use these columns in row 1:
-   - Week
-   - Activity Name
-   - Type
-   - Responsible
-   - Est Hours
-   - Actual Hours
-   - Status
-3. Add weekly header rows (Week 1, Week 2, etc.) so students fill in below each header.
-4. Save the file in `docs/` and commit it.
+	<p>
+		<img alt="PHP" src="https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php&logoColor=white" />
+		<img alt="MySQL" src="https://img.shields.io/badge/MySQL-8%2B-4479A1?logo=mysql&logoColor=white" />
+		<img alt="Frontend" src="https://img.shields.io/badge/Frontend-Vanilla_JS-F7DF1E?logo=javascript&logoColor=black" />
+		<img alt="Auth" src="https://img.shields.io/badge/Auth-CAS-1f2937" />
+		<img alt="Mailer" src="https://img.shields.io/badge/Email-PHPMailer-0ea5e9" />
+	</p>
+</div>
 
-## Repository Layout
-- `.github/workflows/weekly-snapshot.yml` auto-creates weekly release snapshots.
-- `.github/workflows/snapshot-integrity.yml` detects tampering of past weekly snapshots.
-- `docs/StatusTracker.xls` Excel tracker (update weekly).
-- `docs/ProjectPlan.md` project plan template.
-- `docs/release-labels.txt` optional: add weekly labels/categories for TAs.
-- `docs/admin-setup.md` TA-only: required repo settings (tag protection).
-- `src/` project source code.
+## 1. What ROOK Delivers
 
-## Notes
-- `.gitattributes` marks `.xls/.xlsx` as binary to avoid noisy diffs.
-- `.gitignore` ignores Office temp files like `~$StatusTracker.xls`.
+ROOK is a full-stack room booking portal built for institutional usage, with a modern glassmorphism UI and a PHP/MySQL backend designed around real scheduling constraints.
 
-## Weekly submission integrity (anti-cheat)
+It supports:
 
-### What is enforced automatically
-Every Friday, GitHub Actions will:
+- CAS login and session-backed authentication
+- conflict-safe booking requests with room capacity checks
+- admin approval workflow with decline and clarification loop
+- participant (guest) tagging per booking
+- refreshments workflow (including CDS email trigger)
+- notification center with unread tracking and action navigation
+- user feedback collection for completed bookings
+- admin analytics, charting, and PDF export for today’s schedule
+- dual calendar experiences:
+	- personal/all-bookings calendar
+	- room-centric weekly occupancy calendar
 
-1. **Require weekly activity**: `docs/StatusTracker.xls` and `docs/ProjectPlan.md` must have at least one commit in the current week window.
-2. **Create an immutable anchor**: an **annotated git tag** `submission-week-N` is created pointing to the repository state for that week.
-3. **Create a release** from that tag. The release body is exactly the annotated tag message.
-4. **Include a hash manifest**: the tag/release body includes sha256 hashes of every file under `src/` and `docs/`.
+## 2. Signature Features
 
-If any check fails, the weekly release/tag is **not created** (the workflow fails).
+### User Experience
 
-### How teams add "labels/categories" without editing the Release
-Edit `docs/release-labels.txt`. Its contents are included in the tag annotation + release body.
+- futuristic landing + CAS entry flow
+- book-room flow with live availability search and room cards
+- filtered personal schedule (list + calendar toggle)
+- cancellation and completion confirmations via modal UX
+- feedback modal with interactive star rating
 
-### Allowing teams to add extra git tags
-Teams may create additional git tags (e.g., `milestone-1`) on their own commits.
-However, to prevent rewriting submission history, course admins should enable **Tag protection** for:
+### Admin Experience
 
-- `submission-week-*` (no deletions / force-updates)
+- pending queue with Approve, Decline, and Request More Info actions
+- clarification round-trip with user responses
+- analytics dashboard with month/year/room filters
+- user feedback board with room filter and pagination
+- one-click export of today’s approved schedule as PDF
 
-### Tamper detection
-Another workflow runs periodically to verify that for every `submission-week-*` tag:
+### System Intelligence
 
-- the GitHub Release body matches the annotated tag message (SHA256 check)
+- overlap conflict detection on pending/approved bookings
+- role-aware data visibility (`own` vs `all` bookings)
+- trend-ranked room discovery (WTRS ranking in search module)
+- periodic notification polling and unread badge updates
 
-If a mismatch is found, it fails and opens a GitHub Issue as an audit trail.
+## 3. Architecture Overview
 
-> Note: GitHub cannot fully prevent cheating if students have full write access, but protected submission tags + hash manifests make manipulation difficult and highly detectable.
+```mermaid
+flowchart LR
+		A[Frontend SPA<br/>HTML + CSS + ES Modules] -->|fetch JSON| B[PHP API Router]
+		B --> C[Controllers]
+		C --> D[Models]
+		D --> E[(MySQL)]
+		C --> F[PHPMailer SMTP]
+		F --> G[Users / Admins / CDS]
+```
 
-## Process Integrity Safeguards (TA Use)
-Use these interventions to discourage fabrication and enforce process adherence.
+### Request Flow
 
-### Tier 1: Soft Intervention (Mentorship)
-- Observer Effect Warning: reference a specific tracker data point to signal review.
-  Script: "I noticed in your tracker that Task A took exactly 4.0 hours and Task B took exactly 4.0 hours. Real development usually has more variation (e.g., 3.5 or 4.25). Please ensure you are logging actual clock times, not rough estimates."
-- Git History Trap: if commits show batching, ask for proof tied to the stated day.
-  Script: "Your tracker says you finished the API setup on Tuesday. Can you show me the git commit hash corresponding to that specific task on Tuesday?"
+1. Browser calls API under `/src/backend/public`.
+2. Router dispatches to route groups (`auth`, `rooms`, `bookings`, `feedback`, `users`, `notifications`).
+3. Controllers validate input and enforce role/session rules.
+4. Models execute SQL via PDO and return structured data.
+5. API responds with a unified response envelope:
 
-### Tier 2: Hard Intervention (Grading Penalty)
-- Variance Check: if variance is suspiciously low (e.g., every entry is 2 hours), deduct 10-20% of the weekly process grade for Data Quality.
-  Justification: "Data Quality. The logs provided lack statistical realism and appear smoothed. This is poor project management practice."
-- Friday Night Deduction: if the tracker was only touched right before the deadline, deduct 50% of the process grade for Lack of Continuous Integration.
-  Justification: "Agile requires iterative tracking. Batch-updating at the deadline defeats the purpose of the tracker."
+```json
+{
+	"success": true,
+	"message": "...",
+	"data": { }
+}
+```
 
-### Tier 3: Formal Integrity Violation
-- Forensic Audit: if the tracker claims work with no code changes in `src/`, conduct a Viva audit.
-  Action: open GitHub Insights (Network graph) live, overlay tracker claims, and ask for the corresponding code.
-  Outcome: if no code exists for claimed work, report Academic Dishonesty to the course professor.
+## 4. Booking Lifecycle
 
-## Policy Text for Course Handout
-- Integrity of Project Artifacts: The `StatusTracker.xls` is a living document, not a homework assignment. It must reflect the actual state of development.
-- Batch Updates: Updating logs retroactively for multiple days/weeks is considered a failure of process adherence.
-- Fabrication: Logging hours for work not supported by version control evidence (git commits) constitutes academic dishonesty and will result in a grade of zero for that module.
-- Verification: Teaching staff reserve the right to audit tracker data against commit timestamps and variance analysis.
+```mermaid
+stateDiagram-v2
+		[*] --> pending: User creates booking
+		pending --> approved: Admin approves
+		pending --> declined: Admin declines
+		pending --> pending: Admin requests details
+		pending --> pending: User provides clarification
+		pending --> cancelled: User cancels (before start)
+		approved --> cancelled: User cancels (before start)
+		approved --> completed: Admin marks completed (after end_time)
+		completed --> feedback: User submits rating/comments
+		declined --> [*]
+		cancelled --> [*]
+		feedback --> [*]
+```
+
+## 5. Project Structure
+
+```text
+Room_booking_Portal/
+├─ src/
+│  ├─ frontend/               # SPA UI, modules, styles
+│  ├─ backend/
+│  │  ├─ controllers/         # business logic
+│  │  ├─ models/              # data access
+│  │  ├─ routes/              # endpoint mapping
+│  │  ├─ middleware/          # auth/admin guards
+│  │  ├─ database/            # connection, schema, seeder
+│  │  ├─ utils/               # response + email helpers
+│  │  └─ public/index.php     # API entry
+│  ├─ index.php               # redirects to frontend
+│  └─ router.php              # PHP built-in server router
+└─ README.md
+```
+
+## 6. API Quick Reference
+
+Base URL during local run:
+
+- `http://localhost:8000/src/backend/public`
+
+### Health and Auth
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/health` | No | API + DB health check |
+| GET | `/login` | No | Redirect to CAS login |
+| GET | `/callback?ticket=...` | No | CAS callback validation |
+| GET/POST | `/logout` | Yes | Session clear + CAS logout redirect |
+| GET | `/me` | Yes | Current logged-in user |
+
+### Rooms
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/rooms` | No | List rooms (optional `type`, `capacity`) |
+| GET | `/rooms/available` | No | Available rooms for slot (`startTime`, `endTime`, filters) |
+| GET | `/rooms/{id}` | No | Room details |
+| GET | `/rooms/{id}/availability` | No | Availability check for one room |
+| GET | `/rooms/{id}/feedback` | Yes | Feedback for room |
+| GET | `/rooms/{id}/bookings` | Yes | Booking schedule for room |
+
+### Bookings
+
+| Method | Endpoint | Auth | Role | Description |
+|---|---|---|---|---|
+| POST | `/bookings` | Yes | User/Admin | Create booking request |
+| GET | `/bookings` | Yes | User/Admin | Filter bookings (`userId` only effective for admin) |
+| GET | `/bookings/{id}` | Yes | User/Admin | Booking by id |
+| PATCH | `/bookings/{id}` | Yes | Owner | Update booking |
+| PATCH | `/bookings/{id}/cancel` | Yes | Owner | Cancel own booking |
+| PATCH | `/bookings/{id}/complete` | Yes | Admin | Mark approved booking as completed |
+| PATCH | `/bookings/{id}/approve` | Yes | Admin | Approve pending booking |
+| PATCH | `/bookings/{id}/decline` | Yes | Admin | Decline with reason |
+| PATCH | `/bookings/{id}/request-details` | Yes | Admin | Ask user for clarification |
+| POST | `/bookings/{id}/provide-details` | Yes | User/Admin | Submit clarification response |
+| GET | `/bookings/statistics` | Yes | Admin | Aggregated stats |
+
+### Feedback, Users, Notifications
+
+| Method | Endpoint | Auth | Role | Description |
+|---|---|---|---|---|
+| POST | `/feedback` | Yes | Owner | Submit feedback (completed booking only) |
+| GET | `/feedback` | Yes | Admin | Get all feedback or by `bookingId` |
+| GET | `/users` | Yes | User/Admin | Get users list (for participant selection) |
+| GET | `/notifications` | Yes | User/Admin | My notifications |
+| PATCH | `/notifications/mark-all-read` | Yes | User/Admin | Mark all as read |
+| PATCH | `/notifications/{id}/read` | Yes | User/Admin | Mark one as read |
+| DELETE | `/notifications/{id}` | Yes | User/Admin | Delete one notification |
+
+## 7. Local Setup
+
+## 7.1 Prerequisites
+
+- PHP 8.1+
+- MySQL 8+ (or compatible MariaDB)
+- A browser with JS enabled
+- CAS account access (for real login flow)
+
+## 7.2 Clone and Enter
+
+```bash
+git clone <your-repository-url>
+cd Room_booking_Portal
+```
+
+## 7.3 Create Database
+
+```sql
+CREATE DATABASE rbp_prototype CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Import schema:
+
+```bash
+mysql -u root -p rbp_prototype < src/backend/database/schema.sql
+```
+
+## 7.4 Configure DB Connection
+
+Edit:
+
+- `src/backend/database/connection.php`
+
+Set:
+
+- `$host`
+- `$dbname`
+- `$user`
+- `$password`
+
+## 7.5 Configure Email (Optional but Recommended)
+
+Edit:
+
+- `src/backend/config/mail.php`
+
+Set your SMTP values and app password. Email features include:
+
+- booking request mail to admins
+- approval mail to requester
+- decline mail to requester
+- refreshment request mail to CDS
+
+## 7.6 Seed Sample Data (Optional)
+
+```bash
+php src/backend/database/seeder.php
+```
+
+## 7.7 Start the App
+
+From project root:
+
+```bash
+php -S localhost:8000 -t . src/router.php
+```
+
+Open:
+
+- `http://localhost:8000/`
+
+Health check:
+
+- `http://localhost:8000/src/backend/public/health`
+
+## 8. Frontend Libraries Used
+
+- Chart.js (dashboard analytics)
+- FullCalendar (schedule + room calendar)
+- jsPDF + autotable (admin PDF export)
+- Font Awesome (icons)
+
+All are loaded via CDN in `src/frontend/index.html`.
+
+## 9. Business Rules Enforced in Code
+
+- Room type validation: `classroom` or `meeting`
+- Capacity must be positive and not exceed room capacity
+- End time must be after start time
+- Overlap conflict prevention for pending/approved bookings
+- Only owner can cancel/update own booking
+- Only admin can approve/decline/request-details/complete
+- Feedback allowed only once and only after booking is completed
+
+## 10. Security and Production Hardening Notes
+
+Before production deployment:
+
+- move DB and SMTP secrets to environment variables
+- remove hardcoded credentials from tracked files
+- enable HTTPS and secure session cookie settings
+- add CSRF protections for state-changing endpoints
+- add rate limiting and centralized audit logging
+- consider replacing polling notifications with WebSocket/SSE
+
+## 11. Known Implementation Notes
+
+- Search and booking forms currently show extra room type options (`conference`, `lab`) while backend accepts `classroom` and `meeting`.
+- Seeder has a notifications section that intends to attach notifications to bookings; review booking-id collection logic if richer sample notifications are needed.
+
+## 12. Why This Project Stands Out
+
+ROOK is not just CRUD around rooms. It combines:
+
+- institutional SSO (CAS)
+- real scheduling constraints and conflict logic
+- role-sensitive operations and visibility
+- operational email workflows
+- notification-driven interaction loops
+- admin analytics and export tooling
+- modern, premium-feel interface architecture
+
+That combination makes it a strong portfolio-grade system and a practical base for campus or enterprise booking operations.
